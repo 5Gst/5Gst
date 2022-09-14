@@ -2,15 +2,18 @@ package ru.scoltech.openran.speedtest.customViews;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import androidx.core.view.ViewGroupKt;
+
 import ru.scoltech.openran.speedtest.R;
+import ru.scoltech.openran.speedtest.domain.SpeedTestResult;
 
 public class ResultView extends TableLayout {
 
-    private TextView downloadSpeedTV;
-    private TextView uploadSpeedTV;
+    private TableLayout resultTable;
     private TextView pingTV;
 
     public ResultView(Context context, AttributeSet attrs) {
@@ -22,17 +25,20 @@ public class ResultView extends TableLayout {
     }
 
     private void init() {
-        downloadSpeedTV = findViewById(R.id.download_value_res);
-        uploadSpeedTV = findViewById(R.id.upload_value_res);
+        resultTable = findViewById(R.id.result_table);
         pingTV = findViewById(R.id.ping_value_res);
     }
 
-    public void setDownloadSpeed(String speed) {
-        downloadSpeedTV.setText(speed);
-    }
-
-    public void setUploadSpeed(String speed) {
-        uploadSpeedTV.setText(speed);
+    public void setSpeedTestResult(final SpeedTestResult speedTestResult) {
+        resultTable.removeViews(1, resultTable.getChildCount() - 1);
+        for (SpeedTestResult.Entry resultEntry : speedTestResult.getEntries()) {
+            inflate(getContext(), R.layout.result_row_template, resultTable);
+            final View entryView = resultTable.getChildAt(resultTable.getChildCount() - 1);
+            ((TextView) entryView.findViewById(R.id.result_entry_name))
+                    .setText(resultEntry.getStageConfiguration().getName());
+            ((TextView) entryView.findViewById(R.id.result_entry_value))
+                    .setText(resultEntry.getMeasurementResult());
+        }
     }
 
     public void setPing(String ping) {

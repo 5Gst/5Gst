@@ -12,17 +12,22 @@ import android.view.View;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.LongSummaryStatistics;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import ru.scoltech.openran.speedtest.domain.SpeedTestResult;
+import ru.scoltech.openran.speedtest.domain.StageConfiguration;
 
 public class SpeedManager {
-    private int[] uploadArray;
-    private int[] downloadArray;
-
 
     private static SpeedManager instance;
+    private final List<SpeedTestResult.Entry> speedResults = new ArrayList<>();
+    private final Lock speedResultsLock = new ReentrantLock();
 
     private SpeedManager() {
     }
@@ -34,19 +39,26 @@ public class SpeedManager {
         return instance;
     }
 
-    public void attachList(List<String> list) {
-
-        downloadArray = new int[list.size() / 2];
-        for (int i = 0; i < downloadArray.length; i++) {
-            downloadArray[i] = Integer.parseInt(list.get(i));
-        }
-
-        uploadArray = new int[list.size() - list.size() / 2];
-        for (int i = 0; i < uploadArray.length; i++) {
-            uploadArray[i] = Integer.parseInt(list.get(i));
+    public SpeedTestResult flushResults() {
+        speedResultsLock.lock();
+        try {
+            final List<SpeedTestResult.Entry> result = new ArrayList<>(speedResults);
+            speedResults.clear();
+            return new SpeedTestResult(result);
+        } finally {
+            speedResultsLock.unlock();
         }
     }
 
+    public void addStageResult(final StageConfiguration stageConfiguration,
+                               final String speedString) {
+        speedResultsLock.lock();
+        try {
+            speedResults.add(new SpeedTestResult.Entry(stageConfiguration, speedString));
+        } finally {
+            speedResultsLock.unlock();
+        }
+    }
 
     private Pair<Integer, Integer> convertBitToMbps(int speed) {
 
@@ -98,26 +110,10 @@ public class SpeedManager {
         return null;
     }
 
-    public Pair<Integer, Integer> getAverageUploadSpeed() {
-        return getAverageSpeed(uploadArray);
-    }
-
-    public Pair<Integer, Integer> getAverageDownloadSpeed() {
-        return getAverageSpeed(downloadArray);
-    }
-
-    public int[] getDownloadArray() {
-        return downloadArray;
-    }
-
-    public int[] getUploadArray() {
-        return uploadArray;
-    }
-
-
     public Bitmap generateImage(Activity activity) {
 
         //TODO: rewrite with xml view only
+        // TODO fix for 2+ stages
         Bitmap bg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.generated_result_background);
 
         Bitmap background = bg.copy(Bitmap.Config.ARGB_8888, true);

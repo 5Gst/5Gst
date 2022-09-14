@@ -1,12 +1,10 @@
 package ru.scoltech.openran.speedtest.manager
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import com.squareup.okhttp.HttpUrl
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.MultithreadedIperfOutputParser
-import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
 import ru.scoltech.openran.speedtest.task.*
 import ru.scoltech.openran.speedtest.task.impl.*
 import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
@@ -24,7 +22,7 @@ private constructor(
     private val onPingUpdate: (Long) -> Unit,
     private val onStageStart: (StageConfiguration) -> Unit,
     private val onStageSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
-    private val onStageFinish: (LongSummaryStatistics) -> Unit,
+    private val onStageFinish: (StageConfiguration, LongSummaryStatistics) -> Unit,
     private val onFinish: () -> Unit,
     private val onStop: () -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
@@ -32,11 +30,15 @@ private constructor(
 ) {
     private val lock = ReentrantLock()
     private var taskChain: TaskChain<*>? = null
-    private val stageConfigurationParser = StageConfigurationParser()
 
-    fun start(useBalancer: Boolean, mainAddress: String, idleBetweenTasksMelees: Long) {
+    fun start(
+        useBalancer: Boolean,
+        mainAddress: String,
+        idleBetweenTasksMelees: Long,
+        stageConfigurations: List<StageConfiguration>,
+    ) {
         val localTaskChain = if (useBalancer) {
-            buildChainUsingBalancer(idleBetweenTasksMelees)
+            buildChainUsingBalancer(idleBetweenTasksMelees, stageConfigurations)
         } else {
             buildDirectIperfChain()
         }
@@ -46,7 +48,10 @@ private constructor(
         }
     }
 
-    fun buildChainUsingBalancer(idleBetweenTasksMelees: Long): TaskChain<String> {
+    fun buildChainUsingBalancer(
+        idleBetweenTasksMelees: Long,
+        stageConfigurations: List<StageConfiguration>,
+    ): TaskChain<String> {
         val chainBuilder = TaskChainBuilder<String>().onFatalError(onFatalError).onStop(onStop)
         val taskConsumer = chainBuilder.initializeNewChain()
             .andThen(ParseAddressTask())
@@ -78,7 +83,9 @@ private constructor(
                     .andThenTry {
                         initializeNewChain()
                             .andThen(StartServiceSessionTask())
-                            .let { addStagesToChain(it, idleBetweenTasksMelees) }
+                            .let {
+                                addStagesToChain(it, idleBetweenTasksMelees, stageConfigurations)
+                            }
                     }
                     .andThenFinally(StopServiceSessionTask())
             }
@@ -92,19 +99,13 @@ private constructor(
     private fun addStagesToChain(
         taskConsumer: TaskConsumer<ApiClientHolder>,
         idleBetweenTasksMelees: Long,
+        stageConfigurations: List<StageConfiguration>,
     ): TaskConsumer<ApiClientHolder> {
-        val pipelinePreferences = context.getSharedPreferences(
-            "iperf_args_pipeline",
-            AppCompatActivity.MODE_PRIVATE,
-        )
         val immutableDeviceArgsPrefix = context.getString(R.string.immutable_device_args)
         val immutableServerArgsPrefix = context.getString(R.string.immutable_server_args)
 
         var mutableTaskConsumer = taskConsumer
-        stageConfigurationParser.parseFromPreferences(
-            pipelinePreferences,
-            context::getString,
-        ).forEach {  (_, stageConfiguration) ->
+        stageConfigurations.forEach { stageConfiguration ->
             if (stageConfiguration == StageConfiguration.EMPTY) {
                 return@forEach
             }
@@ -124,7 +125,7 @@ private constructor(
                 ),
                 DEFAULT_TIMEOUT.toLong(),
                 onStageSpeedUpdate,
-                onStageFinish,
+                { onStageFinish(stageConfiguration, it) },
                 onLog
             )
 
@@ -149,12 +150,13 @@ private constructor(
                 " " +
                 context.getString(R.string.download_device_iperf_args)
 
+        val stageConfiguration = StageConfiguration("Direct iperf stage", "?", deviceArgs)
         val chainBuilder = TaskChainBuilder<String>().onFatalError(onFatalError).onStop(onStop)
         val taskConsumer = chainBuilder.initializeNewChain()
             .andThen(ParseAddressTask())
             .andThen(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
             .andThenUnstoppable {
-                onStageStart(StageConfiguration("Direct iperf stage", "?", deviceArgs))
+                onStageStart(stageConfiguration)
                 it
             }
             .andThen(
@@ -168,7 +170,7 @@ private constructor(
                     ),
                     DEFAULT_TIMEOUT.toLong(),
                     onStageSpeedUpdate,
-                    onStageFinish,
+                    { onStageFinish(stageConfiguration, it) },
                     onLog
                 )
             )
@@ -188,7 +190,8 @@ private constructor(
         private var onStageStart: Consumer<StageConfiguration> = Consumer {}
         private var onStageSpeedUpdate: BiConsumer<LongSummaryStatistics, Long> =
             BiConsumer { _, _ -> }
-        private var onStageFinish: Consumer<LongSummaryStatistics> = Consumer {}
+        private var onStageFinish: BiConsumer<StageConfiguration, LongSummaryStatistics> =
+            BiConsumer { _, _ -> }
         private var onFinish: Runnable = Runnable {}
         private var onStop: Runnable = Runnable {}
         private var onLog: (String, String, Exception?) -> Unit = { _, _, _ -> }
@@ -213,18 +216,18 @@ private constructor(
             return this
         }
 
-        fun onStageStart(onDownloadStart: Consumer<StageConfiguration>): Builder {
-            this.onStageStart = onDownloadStart
+        fun onStageStart(onStageStart: Consumer<StageConfiguration>): Builder {
+            this.onStageStart = onStageStart
             return this
         }
 
-        fun onStageSpeedUpdate(onDownloadSpeedUpdate: BiConsumer<LongSummaryStatistics, Long>): Builder {
-            this.onStageSpeedUpdate = onDownloadSpeedUpdate
+        fun onStageSpeedUpdate(onStageSpeedUpdate: BiConsumer<LongSummaryStatistics, Long>): Builder {
+            this.onStageSpeedUpdate = onStageSpeedUpdate
             return this
         }
 
-        fun onStageFinish(onDownloadFinish: Consumer<LongSummaryStatistics>): Builder {
-            this.onStageFinish = onDownloadFinish
+        fun onStageFinish(onStageFinish: BiConsumer<StageConfiguration, LongSummaryStatistics>): Builder {
+            this.onStageFinish = onStageFinish
             return this
         }
 

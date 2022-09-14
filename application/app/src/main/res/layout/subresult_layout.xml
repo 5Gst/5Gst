@@ -4,27 +4,31 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <!--    Download col-->
+    <!--    Previous col-->
     <LinearLayout
-        android:id="@+id/block_download"
-        android:layout_width="wrap_content"
+        android:id="@+id/block_previous"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/label_download"
+            android:id="@+id/label_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:fontFamily="@font/futura_pt_demi"
             android:letterSpacing="0"
-            android:text="@string/download"
+            android:text="@string/empty"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center"
             android:textAppearance="@style/Headline3"
             android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
-            android:id="@+id/value_download"
+            android:id="@+id/value_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
@@ -34,7 +38,7 @@
             android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
-            android:id="@+id/caption_download"
+            android:id="@+id/caption_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
@@ -44,28 +48,32 @@
             android:textColor="?android:attr/textColorPrimary" />
     </LinearLayout>
 
-    <!--    Upload col-->
+    <!--    Current col-->
     <LinearLayout
-        android:id="@+id/block_upload"
-        android:layout_width="wrap_content"
+        android:id="@+id/block_current"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
+        android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/label_upload"
+            android:id="@+id/label_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:fontFamily="@font/futura_pt_demi"
             android:letterSpacing="0"
-            android:text="@string/upload"
+            android:text="@string/empty"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center"
             android:textAppearance="@style/Headline3"
             android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
-            android:id="@+id/value_upload"
+            android:id="@+id/value_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
@@ -75,7 +83,7 @@
             android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
-            android:id="@+id/caption_upload"
+            android:id="@+id/caption_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

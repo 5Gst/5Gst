@@ -3,13 +3,13 @@ package ru.scoltech.openran.speedtest.repository
 import android.content.Context
 import android.database.SQLException
 import android.database.sqlite.SQLiteException
-import ru.scoltech.openran.speedtest.domain.SpeedTestResult
+import ru.scoltech.openran.speedtest.domain.SpeedTestResultOld
 import kotlin.jvm.Throws
 
 interface SpeedTestResultRepository {
-    fun save(result: SpeedTestResult)
-    fun findAllByPageAndSizeOrderedById(page: Long, size: Long): List<SpeedTestResult>
-    fun findAll(): List<SpeedTestResult>
+    fun save(result: SpeedTestResultOld)
+    fun findAllByPageAndSizeOrderedById(page: Long, size: Long): List<SpeedTestResultOld>
+    fun findAll(): List<SpeedTestResultOld>
 
     companion object {
         @Volatile

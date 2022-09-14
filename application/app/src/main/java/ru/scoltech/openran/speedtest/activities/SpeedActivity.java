@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import kotlin.Unit;
 import kotlin.collections.SetsKt;
@@ -24,13 +24,14 @@ import ru.scoltech.openran.speedtest.customViews.CardView;
 import ru.scoltech.openran.speedtest.customViews.HeaderView;
 import ru.scoltech.openran.speedtest.customViews.ResultView;
 import ru.scoltech.openran.speedtest.customViews.SubResultView;
+import ru.scoltech.openran.speedtest.domain.SpeedTestResult;
 import ru.scoltech.openran.speedtest.manager.DownloadUploadSpeedTestManager;
+import ru.scoltech.openran.speedtest.parser.StageConfigurationParser;
 
 
 public class SpeedActivity extends AppCompatActivity {
 
     private Wave cWave;
-    private TextView stageNameTextView;
     private CardView mCard;
     private SubResultView mSubResults; // in progress result
     private HeaderView mHeader;
@@ -43,7 +44,9 @@ public class SpeedActivity extends AppCompatActivity {
 
     private SpeedManager sm;
     private DownloadUploadSpeedTestManager speedTestManager;
+    private final StageConfigurationParser stageConfigurationParser = new StageConfigurationParser();
 
+    private final static String LOG_TAG = SpeedActivity.class.getSimpleName();
     private final static int TASK_DELAY = 2500;
 
     @Override
@@ -62,7 +65,6 @@ public class SpeedActivity extends AppCompatActivity {
 
         actionBtn = findViewById(R.id.action_btn);
 
-        stageNameTextView = findViewById(R.id.current_stage_name);
         mCard = findViewById(R.id.card);
         cWave = mCard.getWave();
 
@@ -77,10 +79,10 @@ public class SpeedActivity extends AppCompatActivity {
                 .onPingUpdate((ping) -> runOnUiThread(() -> mCard.setPing((int) ping)))
                 .onStageStart((stageConfiguration) -> runOnUiThread(() -> {
                     mCard.setInstantSpeed(0, 0);
+                    mSubResults.addNewStage(stageConfiguration.getName());
 
                     cWave.start();
                     cWave.attachSpeed(0);
-                    stageNameTextView.setText(stageConfiguration.getName());
                 }))
                 .onStageSpeedUpdate((statistics, speedBitsPS) -> runOnUiThread(() -> {
                     Pair<Integer, Integer> instSpeed = sm.getSpeedWithPrecision(speedBitsPS.intValue(), 2);
@@ -89,30 +91,28 @@ public class SpeedActivity extends AppCompatActivity {
                     //animation
                     cWave.attachSpeed(instSpeed.first);
                 }))
-                .onStageFinish((statistics) -> runOnUiThread(() -> {
-                    mSubResults.setDownloadSpeed(getSpeedString(sm.getAverageSpeed(statistics)));
+                .onStageFinish((stageConfiguration, statistics) -> runOnUiThread(() -> {
+                    final String speedString = getSpeedString(sm.getAverageSpeed(statistics));
+                    mSubResults.setCurrentStageSpeed(speedString);
+                    sm.addStageResult(stageConfiguration, speedString);
                     cWave.stop();
                 }))
                 .onFinish(() -> runOnUiThread(() -> {
                     actionBtn.setPlay();
 
-                    String downloadSpeed = mSubResults.getDownloadSpeed();
-                    String uploadSpeed = mSubResults.getUploadSpeed();
+                    final SpeedTestResult speedTestResult = sm.flushResults();
                     String ping = mCard.getPing();
-                    onResultUI(downloadSpeed, uploadSpeed, ping);
+                    onResultUI(speedTestResult, ping);
                 }))
                 .onStop(() -> runOnUiThread(() -> {
                     onStopUI();
                     actionBtn.setPlay();
-                    mSubResults.setEmpty();
                 }))
                 .onFatalError((s, exception) -> runOnUiThread(() -> {
-                    // TODO bad tag
-                    Log.e("FATAL", s, exception);
+                    Log.e(LOG_TAG, s, exception);
 
                     onStopUI();
                     actionBtn.setPlay();
-                    mSubResults.setEmpty();
                 }))
                 .onLog((tag, message, exception) -> {
                     if (exception == null) {
@@ -142,7 +142,7 @@ public class SpeedActivity extends AppCompatActivity {
         return String.format(Locale.ENGLISH, "%d.%d", speed.first, speed.second);
     }
 
-    private void onResultUI(String downloadSpeed, String uploadSpeed, String ping) {
+    private void onResultUI(SpeedTestResult speedTestResult, String ping) {
 
         mSubResults.setVisibility(View.GONE);
 
@@ -151,8 +151,7 @@ public class SpeedActivity extends AppCompatActivity {
         mCard.setEmptyCaptions();
         mCard.setMessage("Done");
 
-        mResults.setDownloadSpeed(downloadSpeed);
-        mResults.setUploadSpeed(uploadSpeed);
+        mResults.setSpeedTestResult(speedTestResult);
         mResults.setPing(ping);
         mHeader.setSectionName("Results");
 
@@ -182,16 +181,25 @@ public class SpeedActivity extends AppCompatActivity {
         shareBtn.setVisibility(View.GONE);
         saveBtn.setVisibility(View.GONE);
 
+        sm.flushResults();
         speedTestManager.start(
-                getSharedPreferences( getString(R.string.globalSharedPreferences),MODE_PRIVATE).getBoolean(
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getBoolean(
                         ApplicationConstants.USE_BALANCER_KEY,
                         true
                 ),
-                getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).getString(
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                         ApplicationConstants.MAIN_ADDRESS_KEY,
                         getString(R.string.default_main_address)
                 ),
-                TASK_DELAY
+                TASK_DELAY,
+                stageConfigurationParser
+                        .parseFromPreferences(
+                                getSharedPreferences("iperf_args_pipeline", MODE_PRIVATE),
+                                this::getString
+                        )
+                        .stream()
+                        .map(StageConfigurationParser.FromPreferencesStageConfiguration::getStageConfiguration)
+                        .collect(Collectors.toList())
         );
     }
 
@@ -200,8 +208,6 @@ public class SpeedActivity extends AppCompatActivity {
 
         cWave.stop();
         actionBtn.setPlay();
-
-        mSubResults.setEmpty();
 
         speedTestManager.stop();
     }

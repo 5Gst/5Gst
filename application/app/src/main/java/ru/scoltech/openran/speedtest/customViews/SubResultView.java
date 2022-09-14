@@ -9,10 +9,12 @@ import ru.scoltech.openran.speedtest.R;
 
 public class SubResultView extends LinearLayout {
 
-    private TextView downloadSpeedTV;
-    private TextView uploadSpeedTV;
+    private TextView previousStageNameTextView;
+    private TextView previousStageSpeedTextView;
+    private TextView currentStageNameTextView;
+    private TextView currentStageSpeedTextView;
 
-    public SubResultView(Context context, AttributeSet attrs) {
+    public SubResultView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
 
         inflate(getContext(), R.layout.subresult_layout, this);
@@ -21,30 +23,31 @@ public class SubResultView extends LinearLayout {
     }
 
     private void init() {
-        downloadSpeedTV = findViewById(R.id.value_download);
-        uploadSpeedTV = findViewById(R.id.value_upload);
+        previousStageNameTextView = findViewById(R.id.label_previous);
+        previousStageSpeedTextView = findViewById(R.id.value_previous);
+        currentStageNameTextView = findViewById(R.id.label_current);
+        currentStageSpeedTextView = findViewById(R.id.value_current);
     }
 
-
-    public void setUploadSpeed(String speed) {
-        uploadSpeedTV.setText(speed);
+    public void setCurrentStageSpeed(final String speed) {
+        currentStageSpeedTextView.setText(speed);
     }
 
-    public void setDownloadSpeed(String speed) {
-        downloadSpeedTV.setText(speed);
+    public void setPreviousStageSpeed(final String speed) {
+        previousStageSpeedTextView.setText(speed);
     }
 
-
-    public String getDownloadSpeed() {
-        return downloadSpeedTV.getText().toString();
-    }
-
-    public String getUploadSpeed() {
-        return uploadSpeedTV.getText().toString();
+    public void addNewStage(final String newStageName) {
+        previousStageNameTextView.setText(currentStageNameTextView.getText());
+        previousStageSpeedTextView.setText(currentStageSpeedTextView.getText());
+        currentStageNameTextView.setText(newStageName);
+        currentStageSpeedTextView.setText(getContext().getString(R.string.empty));
     }
 
     public void setEmpty() {
-        setDownloadSpeed(getContext().getString(R.string.empty));
-        setUploadSpeed(getContext().getString(R.string.empty));
+        previousStageNameTextView.setText(getContext().getString(R.string.empty));
+        previousStageSpeedTextView.setText(getContext().getString(R.string.empty));
+        currentStageNameTextView.setText(getContext().getString(R.string.empty));
+        currentStageSpeedTextView.setText(getContext().getString(R.string.empty));
     }
 }

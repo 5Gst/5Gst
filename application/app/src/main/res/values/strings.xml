@@ -32,8 +32,6 @@
     </string-array>
     <string name="mbps">Mbps</string>
     <string name="ping">ping</string>
-    <string name="download">Download</string>
-    <string name="upload">Upload</string>
     <string name="ms">ms</string>
     <string name="section_name">Section name</string>
     <string name="add_widget">Add widget</string>
