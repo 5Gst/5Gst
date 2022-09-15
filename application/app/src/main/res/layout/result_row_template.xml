@@ -1,7 +1,9 @@
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
+    android:layout_marginTop="10dp"
     android:orientation="horizontal">
 
     <TextView
@@ -10,35 +12,32 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:fontFamily="@font/futura_pt_medium"
+        android:paddingEnd="20dp"
 
         android:textAppearance="@style/Subtitle1"
-        android:textColor="?android:attr/textColorPrimary" />
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
         android:id="@+id/result_entry_value"
 
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_marginEnd="20dp"
+        android:layout_height="match_parent"
         android:fontFamily="@font/futura_pt_medium"
-
+        android:gravity="end|bottom"
         android:text="@string/_0"
         android:textAppearance="@style/Headline4"
         android:textColor="?android:attr/textColorPrimary" />
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start|bottom"
+        android:layout_height="match_parent"
         android:fontFamily="@font/futura_pt_medium"
+        android:gravity="start|bottom"
+        android:paddingStart="20dp"
 
         android:text="@string/mbps"
         android:textAppearance="@style/Subtitle1"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:ignore="RtlSymmetry" />
 </TableRow>

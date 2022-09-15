@@ -113,7 +113,6 @@ public class SpeedManager {
     public Bitmap generateImage(Activity activity) {
 
         //TODO: rewrite with xml view only
-        // TODO fix for 2+ stages
         Bitmap bg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.generated_result_background);
 
         Bitmap background = bg.copy(Bitmap.Config.ARGB_8888, true);
@@ -121,7 +120,7 @@ public class SpeedManager {
         backgroundCanvas.drawBitmap(background, 0, 0, null);
 
 
-        View v = activity.findViewById(R.id.result);
+        View v = activity.findViewById(R.id.result).findViewById(R.id.result_table);
 
         Bitmap foreground = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas foregroundCanvas = new Canvas(foreground);
