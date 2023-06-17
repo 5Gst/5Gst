@@ -138,7 +138,7 @@ SWAGGER_SETTINGS = {
         description="Speedtest iperf service",
         contact=openapi.Contact(email=os.getenv("SUPPORT_EMAIL", "dev@5gst.ru")),
         license=openapi.License(name="BSD 3-Clause",
-                                url='https://raw.githubusercontent.com/SkoltechSummerCamp/5Gst/main/LICENSE'),
+                                url='https://raw.githubusercontent.com/5Gst/5Gst/main/LICENSE'),
     ),
     'DEFAULT_GENERATOR_CLASS': SpeedtestAPISchemeGenerator,
     'DEFAULT_AUTO_SCHEMA_CLASS': SpeedtestSwaggerAutoSchema,

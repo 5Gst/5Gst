@@ -1,9 +1,7 @@
 name: "Grouped CI of balancer, service and applications"
 
-on: 
-  push:
-  pull_request:
-    
+on: [push, pull_request]
+
 jobs:
 
 
@@ -193,12 +191,12 @@ jobs:
           echo "version=$(cat ../VERSION)" > $GITHUB_ENV
           
       - name: build docker image
-        if: github.repository != 'SkoltechSummerCamp/5Gst'
+        if: github.repository != '5gst/5gst'
         run: docker build . --tag new_balancer_image:${{ env.version }}.${{ github.run_number }}
 
       - name: Log in to Docker Hub
         if: |
-          github.repository == 'SkoltechSummerCamp/5Gst' && github.event_name == 'push'
+          github.repository == '5gst/5gst' && github.event_name == 'push'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -206,22 +204,22 @@ jobs:
 
       - name: Build and push Docker image
         if: |
-          github.repository == 'SkoltechSummerCamp/5Gst' && github.event_name == 'push' 
+          github.repository == '5gst/5gst' && github.event_name == 'push'
         uses: docker/build-push-action@v2
         with:
           context: ./balancer
           push: true
           tags: skoltech/speedtest-balancer:${{ env.version }}.${{ github.run_number }}, skoltech/speedtest-balancer:latest
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
+
+
+
+
+
+
+
+
+
+
   application-debug-build:
     runs-on: ubuntu-latest
     defaults:
@@ -278,7 +276,7 @@ jobs:
         with:
           name: ${{ env.artifactName }}-debug
           path: application/gh-artifacts-debug-build/*
-          
+
   application-release-build:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
@@ -355,19 +353,19 @@ jobs:
         with:
           name: ${{ env.artifactName }}-release
           path: application/gh-artifacts-release-build/*
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
+
+
+
+
+
+
+
+
+
+
 
   service-generate-swagger:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     if: github.event_name == 'push'
     env:
       SERVICE_IP_ADDRESS: localhost
@@ -401,7 +399,7 @@ jobs:
         with:
           name: swagger-schema-service
           path: service/swagger-service.yaml
-          
+
   service-generate-code:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -450,7 +448,7 @@ jobs:
         with:
           name: AUTOBUILD-service
           path: AUTOBUILD-service
-          
+
   service-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -483,16 +481,16 @@ jobs:
         with:
             commit_message: 'Generate service client using swagger-codegen'
             file_pattern: application/serviceApi balancer/service_api
-            
-            
-  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает, 
-  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен, 
+
+
+  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает,
+  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен,
   #то новый степ в любом случае выполнился (тип гарантирует, что новый степ всегда будет выполнен вне зависимости от других обстоятельств)
   service-test:
     runs-on: ubuntu-latest
     if:  ${{ always() }}
     needs: service-push
-    env: 
+    env:
       SERVICE_IP_ADDRESS: localhost
       BALANCER_ADDRESS: localhost:5555
       IPERF_PORT: 5001
@@ -507,7 +505,7 @@ jobs:
           submodules: recursive
       - name: Compilation
         run: ./scripts/build-iperf.sh
-        
+
       - name: Install pip, pipenv and packages from Pipfile
         run: |
           python -m pip install --upgrade pip
@@ -517,9 +515,9 @@ jobs:
         run: |
           pipenv run test
             
-            
-  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает, 
-  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен, 
+
+  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает,
+  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен,
   #то новый степ в любом случае выполнился (тип гарантирует, что новый степ всегда будет выполнен вне зависимости от других обстоятельств)
   service-build-iperf:
     if: ${{ always() }}
@@ -544,16 +542,16 @@ jobs:
           
           IPERF_VERSION=$(cat ../iPerf/VERSION)
           echo "artifactName=iperf-$IPERF_VERSION.$GITHUB_RUN_NUMBER" > $GITHUB_ENV
-      
+
       - name: Upload iperf binary to artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}
           path: service/gh-artifacts/*
-          
-          
-  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает, 
-  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен, 
+
+
+  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает,
+  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен,
   #то новый степ в любом случае выполнился (тип гарантирует, что новый степ всегда будет выполнен вне зависимости от других обстоятельств)
   service-speedtest-service:
     if: ${{ always() }}
@@ -576,7 +574,7 @@ jobs:
         with:
           name: ${{ env.iPerfArtifactName }}
           path: service
-      
+
       - name: Setup artifact content
         run: |
           cd ..
@@ -584,16 +582,16 @@ jobs:
           cp -r service/* gh-artifacts/
           
           echo "artifactName=speedtest-service-$(cat VERSION).$GITHUB_RUN_NUMBER" > $GITHUB_ENV
-      
+
       - name: Upload all server files to artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}
           path: gh-artifacts/*
-          
-          
-  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает, 
-  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен, 
+
+
+  #needs нужен для порядка и проверки что предыдущий степ выполнен (тип выполнение нового степа будет ток после того как степ из нидс хорошо отработает,
+  #если не отработает - новый степ не запустится ), а always нужен чтоб если даже из нидс степ не выполнен,
   #то новый степ в любом случае выполнился (тип гарантирует, что новый степ всегда будет выполнен вне зависимости от других обстоятельств)
   service-publish-to-dockerhub:
     if: ${{ always() }}
@@ -603,12 +601,12 @@ jobs:
       run:
         working-directory: ./service
     steps:
-      - name: checkout    
+      - name: checkout
         uses: actions/checkout@v2
         with:
           submodules: recursive
-          
-      - name: Setup version variable  
+
+      - name: Setup version variable
         run: |
           echo "version=$(cat ../VERSION)" > $GITHUB_ENV
       - name: download artifacts
@@ -617,18 +615,18 @@ jobs:
           name: speedtest-service-${{ env.version }}.${{ github.run_number }}
           path: service/gh-artifacts
       - name: build docker image
-        if:  github.repository != 'SkoltechSummerCamp/5Gst'
+        if:  github.repository != '5gst/5gst'
         run: docker build . --tag new_service_image:${{ env.version }}.${{ github.run_number }}
-          
+
       - name: Log in to Docker Hub
-        if:  github.repository == 'SkoltechSummerCamp/5Gst' && github.event_name == 'push'
+        if:  github.repository == '5gst/5gst' && github.event_name == 'push'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        if:  github.repository == 'SkoltechSummerCamp/5Gst' && github.event_name == 'push'
+        if:  github.repository == '5gst/5gst' && github.event_name == 'push'
         uses: docker/build-push-action@v2
         with:
           context: service/gh-artifacts
