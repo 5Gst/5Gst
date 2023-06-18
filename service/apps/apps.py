@@ -1,37 +1,39 @@
-import signal
+import logging
+import os
 import sys
 
-from balancer_communicator import balancer_communicator
 from django.apps import AppConfig
-from iperf_wrapper import iperf
-from watchdog import Watchdog
+from django.core.management.commands import diffsettings
+from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
 
-watchdog = Watchdog(5)
+from apps.logic.watchdog_service import balancer_communication_watchdog_service
+
+logger = logging.getLogger(__name__)
 
 
 class MyAppConfig(AppConfig):
     name = 'apps'
 
     def ready(self):
-        if 'runserver' not in sys.argv:
-            return True
+        # Workaround for development server with auto reload. (we need to execute initialization once)
+        if 'runserver' in sys.argv \
+                and '--noreload' not in sys.argv \
+                and os.getenv(DJANGO_AUTORELOAD_ENV) != 'true':
+            return
 
-        def TimeoutHandler():
-            if iperf.is_started:
-                iperf.stop()
-            balancer_communicator.post_to_server()
-            watchdog.reset()
+        self.print_env()
+        balancer_communication_watchdog_service.start()
 
-        def signal_handler(sig, frame):
-            watchdog.stop()
-            balancer_communicator.delete_from_server()
-            sys.exit(0)
+    def print_env(self):
+        django_settings = diffsettings.Command().handle(output='unified', all=True, default=None)
+        environment_variables = [f"{key}: {value}" for key, value in sorted(os.environ.items())]
+        environment_variables = os.linesep.join(environment_variables)
 
-        signal.signal(signal.SIGINT, signal_handler)
+        message = f'''
+Django settings:
+{django_settings}
 
-        for key, value in balancer_communicator.env_data.items():
-            print(f'{key}: {value}')
-
-        global watchdog
-        watchdog = Watchdog(int(balancer_communicator.env_data['CONNECTING_TIMEOUT']), TimeoutHandler)
-        balancer_communicator.post_to_server()
+Environment variables:
+{environment_variables}
+'''
+        logger.debug(message)

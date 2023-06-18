@@ -1,12 +1,15 @@
 package ru.scoltech.openran.speedtest.task.impl
 
-import io.swagger.client.model.ServerAddressResponse
-import ru.scoltech.openran.speedtest.backend.ServiceApi
+import com.squareup.okhttp.Call
+import ru.scoltech.openran.speedtest.client.service.ApiCallback
+import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
 
-data class StopServiceIperfTask(
-    private val balancerApiBuilder: BalancerApiBuilder
-) : (ServerAddressResponse) -> Unit {
-    override fun invoke(p1: ServerAddressResponse) {
-        ServiceApi(balancerApiBuilder.httpClient).stopIperf(p1.ip, p1.port)
+class StopServiceIperfTask : AbstractServiceRequestTask<ApiClientHolder, Void?, ApiClientHolder>() {
+    override fun sendRequest(argument: ApiClientHolder, callback: ApiCallback<Void?>): Call {
+        return argument.serviceApiClient.stopIperfAsync(callback)
+    }
+
+    override fun processApiResult(argument: ApiClientHolder, apiResult: Void?): ApiClientHolder {
+        return argument
     }
 }

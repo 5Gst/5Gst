@@ -1,40 +1,38 @@
-from rest_framework.status import HTTP_200_OK
-from rest_framework.decorators import api_view
+import logging
+
 from rest_framework.request import Request
-from rest_framework.response import Response
-from iperf_wrapper import iperf
-from balancer_communicator import balancer_communicator
-from apps.apps import watchdog
+from rest_framework.views import APIView
+
+from apps import serializers
+from apps.logic.session_web_service import session_web_service, SessionWebService
+
+logger = logging.getLogger(__name__)
 
 
-@api_view(['GET'])
-def start_iperf(request: Request):
-    watchdog.reset()
-    iperf_parameters = request.query_params.get("args")
-    if iperf_parameters is not None:
-        iperf.iperf_parameters = iperf_parameters
-
-    status = iperf.start(port_iperf=balancer_communicator.env_data['IPERF_PORT'])
-    if status:
-        print(f"iPerf started with parameters {iperf.iperf_parameters}")
-        return Response(data=f"iPerf started with parameters {iperf.iperf_parameters}", status=HTTP_200_OK,
-                        content_type="text/html")
-
-    iperf.stop()
-    status = iperf.start(port_iperf=balancer_communicator.env_data['IPERF_PORT'])
-    if status:
-        return Response(f"iPerf restarted with parameters {iperf.iperf_parameters}")
-
-    return Response("Failed to start iperf")
+class StartSessionView(APIView):
+    @SessionWebService.start_session_swagger_auto_schema
+    def post(self, request: Request):
+        return session_web_service.start_session()
 
 
-@api_view(['GET'])
-def stop_iperf(request: Request):
+class StopSessionView(APIView):
+    @SessionWebService.stop_session_swagger_auto_schema
+    def post(self, request: Request):
+        return session_web_service.stop_session()
 
-    if iperf.is_started:
-        status = iperf.stop()
-        balancer_communicator.post_to_server()
-        watchdog.reset()
-        return Response(f"iPerf stopped with status {status}")
 
-    return Response("iPerf already stopped")
+class StartIperfView(APIView):
+    @SessionWebService.start_iperf_swagger_auto_schema
+    def post(self, request: Request):
+        serializer = serializers.IperfArgsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        iperf_args = serializer.validated_data['iperf_args']
+        iperf_args = iperf_args if iperf_args is not None else ''
+        return session_web_service.start_iperf(iperf_args)
+
+
+class StopIperfView(APIView):
+    @SessionWebService.stop_iperf_swagger_auto_schema
+    def post(self, request: Request):
+        return session_web_service.stop_iperf()

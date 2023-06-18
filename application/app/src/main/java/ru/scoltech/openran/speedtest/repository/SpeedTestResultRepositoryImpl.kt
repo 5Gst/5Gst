@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import ru.scoltech.openran.speedtest.domain.SpeedTestResult
+import ru.scoltech.openran.speedtest.domain.SpeedTestResultOld
 import java.util.*
 import kotlin.jvm.Throws
 
@@ -17,7 +17,7 @@ class SpeedTestResultRepositoryImpl
 constructor(context: Context) : SpeedTestResultRepository {
     private val databaseHelper: DatabaseHelper = DatabaseHelper(context)
 
-    override fun save(result: SpeedTestResult) {
+    override fun save(result: SpeedTestResultOld) {
         try {
             databaseHelper.writableDatabase
                 .insertOrThrow(SPEEDTEST_RESULT_TABLE_NAME, null, ContentValues(6).apply {
@@ -33,7 +33,7 @@ constructor(context: Context) : SpeedTestResultRepository {
         }
     }
 
-    override fun findAllByPageAndSizeOrderedById(page: Long, size: Long): List<SpeedTestResult> {
+    override fun findAllByPageAndSizeOrderedById(page: Long, size: Long): List<SpeedTestResultOld> {
         if (page < 0 || size <= 0) {
             Log.e(LOG_TAG, "Negative page ($page) or non-positive size ($size). " +
                     "Returning empty list...")
@@ -56,7 +56,7 @@ constructor(context: Context) : SpeedTestResultRepository {
         having: String? = null,
         orderBy: String? = null,
         limit: String? = null,
-    ): List<SpeedTestResult> {
+    ): List<SpeedTestResultOld> {
         return databaseHelper.readableDatabase.query(
             distinct,
             SPEEDTEST_RESULT_TABLE_NAME,
@@ -80,11 +80,11 @@ constructor(context: Context) : SpeedTestResultRepository {
         }
     }
 
-    private fun Cursor.toList(): List<SpeedTestResult> {
+    private fun Cursor.toList(): List<SpeedTestResultOld> {
         return try {
             moveToFirst()
             (0 until count).map {
-                SpeedTestResult(
+                SpeedTestResultOld(
                     getLong(getColumnIndexOrThrow(UPLOAD_SPEED_COLUMN_NAME)),
                     getLong(getColumnIndexOrThrow(DOWNLOAD_SPEED_COLUMN_NAME)),
                     getLong(getColumnIndexOrThrow(PING_COLUMN_NAME)),

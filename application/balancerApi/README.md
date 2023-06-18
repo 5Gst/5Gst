@@ -71,24 +71,31 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.ServiceApi;
+import ru.scoltech.openran.speedtest.client.balancer.*;
+import ru.scoltech.openran.speedtest.client.balancer.auth.*;
+import ru.scoltech.openran.speedtest.client.balancer.model.*;
+import ru.scoltech.openran.speedtest.client.balancer.api.BalancerApi;
 
 import java.io.File;
 import java.util.*;
 
-public class ServiceApiExample {
+public class BalancerApiExample {
 
     public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
         
-        ServiceApi apiInstance = new ServiceApi();
+        // Configure API key authorization: 5Gst
+        ApiKeyAuth 5Gst = (ApiKeyAuth) defaultClient.getAuthentication("5Gst");
+        5Gst.setApiKey("YOUR API KEY");
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //5Gst.setApiKeyPrefix("Token");
+
+        BalancerApi apiInstance = new BalancerApi();
         try {
-            ServerAddressResponse result = apiInstance.serviceAcquireCreate();
+            ServerAddressResponse result = apiInstance.acquireService();
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ServiceApi#serviceAcquireCreate");
+            System.err.println("Exception when calling BalancerApi#acquireService");
             e.printStackTrace();
         }
     }
@@ -98,25 +105,34 @@ public class ServiceApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://localhost/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0*
+All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ServiceApi* | [**serviceAcquireCreate**](docs/ServiceApi.md#serviceAcquireCreate) | **POST** /service/acquire/ | 
-*ServiceApi* | [**serviceCreate**](docs/ServiceApi.md#serviceCreate) | **POST** /service/ | 
-*ServiceApi* | [**serviceDelete**](docs/ServiceApi.md#serviceDelete) | **DELETE** /service/ | 
+*BalancerApi* | [**acquireService**](docs/BalancerApi.md#acquireService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/acquire/ | 
+*BalancerApi* | [**login**](docs/BalancerApi.md#login) | **POST** /5gst/iperf_load_balancer/0.1.0/login/ | 
+*BalancerApi* | [**logout**](docs/BalancerApi.md#logout) | **POST** /5gst/iperf_load_balancer/0.1.0/logout/ | 
+*BalancerApi* | [**ping**](docs/BalancerApi.md#ping) | **GET** /5gst/iperf_load_balancer/0.1.0/ping/ | 
+*BalancerApi* | [**registerService**](docs/BalancerApi.md#registerService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/ | 
+*BalancerApi* | [**unregisterService**](docs/BalancerApi.md#unregisterService) | **DELETE** /5gst/iperf_load_balancer/0.1.0/service/ | 
 
 
 ## Documentation for Models
 
+ - [FiveGstToken](docs/FiveGstToken.md)
  - [ServerAddressRequest](docs/ServerAddressRequest.md)
  - [ServerAddressResponse](docs/ServerAddressResponse.md)
 
 
 ## Documentation for Authorization
 
-All endpoints do not require authorization.
 Authentication schemes defined for the API:
+### 5Gst
+
+- **Type**: API key
+- **API key parameter name**: Authorization
+- **Location**: HTTP header
+
 
 ## Recommendation
 

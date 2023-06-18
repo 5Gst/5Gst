@@ -1,7 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">5Gst</string>
     <string name="startIperf">start</string>
     <string name="stopIperf">stop</string>
+    <string name="forceStopIperf">terminate</string>
+    <string name="clearLogs">clear</string>
     <string name="deviceIp">Device ip :</string>
     <string name="refreshIp">refresh</string>
     <string name="hideIp">hide</string>
@@ -16,8 +18,10 @@
     <string name="icmpPing">ICMP PING</string>
     <string name="pingByICMPLabel">ping by ICMP:</string>
     <string name="startUdpPingServer">start udp ping server</string>
-    <string name="simple_ping">Simple ping:</string>
-    <string name="device_information">Device information:</string>
+    <string name="pingText">PING</string>
+    <string name="downloadText">Download iperf args</string>
+    <string name="uploadText">Upload iperf args</string>
+    <string name="device_ip">Device ip:</string>
     <string name="iperf_mobile">iperf mobile args:</string>
     <string name="iperfServer">iperf server args:</string>
     <string name="server_ip">server ip:</string>
@@ -28,8 +32,6 @@
     </string-array>
     <string name="mbps">Mbps</string>
     <string name="ping">ping</string>
-    <string name="download">Download</string>
-    <string name="upload">Upload</string>
     <string name="ms">ms</string>
     <string name="section_name">Section name</string>
     <string name="add_widget">Add widget</string>
@@ -48,4 +50,28 @@
     <string name="policy_title">Terms and Conditions</string>
     <string name="policy_content">By using this app you agree to our <a href="https://5gst.ru/static/Privacy_Policy_for_5G_Speed_Test_App.html">Privacy Policy</a></string>
     <string name="globalSharedPreferences">globalPreferences</string>
+    <string name="google_public_DNS">8.8.8.8</string>
+    <string name="ip_address_mock">255.255.255.255</string>
+    <string name="iperf_args">iperf args</string>
+    <string name="this_device">device:</string>
+    <string name="server">server:</string>
+
+    <string name="iperfSharedPreferences">iperfPreferences</string>
+    <string name="dev_iperf_args">dev_iperf_args</string>
+    <string name="dev_tools_iperf_args_hint">Enter iPerf script</string>
+    <string name="download_device_iperf_args">-u -R -P 10 -b 120m</string>
+    <string name="upload_device_iperf_args">-P 10 -b 120m</string>
+    <string name="download_server_iperf_args">-u</string>
+    <string name="upload_server_iperf_args"> </string>
+    <string name="immutable_device_args" tools:ignore="TypographyDashes">-f b -i 0.1 --sum-only</string>
+    <string name="immutable_server_args">-s</string>
+
+    <string name="user_immutable_down_dev_args">-u -R</string>
+    <string name="user_immutable_down_serv_args">-u</string>
+    <string name="user_immutable_up_dev_args"> </string>
+    <string name="user_immutable_up_serv_args"> </string>
+    <string name="dev_tools">Dev tools</string>
+    <string name="setup_pipeline">Setup pipeline</string>
+    <string name="add_pipeline">Add pipeline</string>
+    <string name="pipeline_name">Pipeline name</string>
 </resources>
