@@ -221,7 +221,7 @@ jobs:
         with:
           context: ./balancer
           push: true
-          tags: skoltech/speedtest-balancer:${{ env.version }}.${{ github.run_number }}, skoltech/speedtest-balancer:latest
+          tags: 5gst/speedtest-balancer:${{ env.version }}.${{ github.run_number }}, 5gst/speedtest-balancer:latest
 
 
 
@@ -665,7 +665,7 @@ jobs:
         with:
           context: service/gh-artifacts
           push: true
-          tags: skoltech/speedtest-service:${{ env.version }}.${{ github.run_number }}, skoltech/speedtest-service:latest
+          tags: 5gst/speedtest-service:${{ env.version }}.${{ github.run_number }}, 5gst/speedtest-service:latest
           
           
           
@@ -688,11 +688,11 @@ jobs:
           echo "version=$(cat ./VERSION)" > $GITHUB_ENV
       - name: install images and convert to .tar
         run: |
-          docker pull skoltech/speedtest-service:latest
-          docker pull skoltech/speedtest-balancer:latest
+          docker pull 5gst/speedtest-service:latest
+          docker pull 5gst/speedtest-balancer:latest
           docker pull postgres:${POSTGRES_VERSION:-14.4}
-          docker save skoltech/speedtest-service:latest | gzip > service.tar.gz
-          docker save skoltech/speedtest-balancer:latest | gzip > balancer.tar.gz
+          docker save 5gst/speedtest-service:latest | gzip > service.tar.gz
+          docker save 5gst/speedtest-balancer:latest | gzip 5gst balancer.tar.gz
           docker save postgres:${POSTGRES_VERSION:-14.4} | gzip > postgres.tar.gz
 
       - name: upload artifacts
