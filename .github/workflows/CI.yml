@@ -352,6 +352,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ secrets.RELEASE_KEYSTORE_GIT_REPOSITORY }}
           path: application/release-keystore
 
