@@ -1,0 +1,8 @@
+[submodule "application/iPerf"]
+	path = application/iPerf
+	url = https://github.com/5Gst/iPerf2-fork.git
+	branch = v2.1.4
+[submodule "service/iPerf"]
+	path = service/iPerf
+	url = https://github.com/5Gst/iPerf2-fork.git
+	branch = v2.1.4
