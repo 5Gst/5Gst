@@ -22,6 +22,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
       - name: Install pip, pipenv and packages from Pipfile
         run: |
           python -m pip install --upgrade pip
@@ -134,6 +138,10 @@ jobs:
         working-directory: ./balancer
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
     - name: make migrations
       run: |
        python -m pip install --upgrade pip
@@ -164,6 +172,10 @@ jobs:
         working-directory: ./balancer
     steps:
     - uses: actions/checkout@main
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
     - name: Install pip, pipenv and packages from Pipfile
       run: |
         python -m pip install --upgrade pip
@@ -386,6 +398,10 @@ jobs:
       - name: Iperf compilation
         run: ./scripts/build-iperf.sh
 
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
       - name: Install pip, pipenv and packages from Pipfile
         run: |
           python -m pip install --upgrade pip
@@ -506,6 +522,10 @@ jobs:
       - name: Compilation
         run: ./scripts/build-iperf.sh
 
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
       - name: Install pip, pipenv and packages from Pipfile
         run: |
           python -m pip install --upgrade pip
