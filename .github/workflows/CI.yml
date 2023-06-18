@@ -351,6 +351,7 @@ jobs:
       - name: Get signing key
         uses: actions/checkout@v2
         with:
+          ref: main
           repository: ${{ secrets.RELEASE_KEYSTORE_GIT_REPOSITORY }}
           path: application/release-keystore
 
