@@ -1,20 +1,18 @@
 # SpeedtestService
 
-[![Build Status](https://github.com/SkoltechSummerCamp/SpeedtestService/workflows/Build%20docker%20image/badge.svg)](https://github.com/SkoltechSummerCamp/SpeedtestService/actions)
-
 ## How To Build Service
 
 1. Clone main repo
 
     ```bash
-    git clone --recursive --recurse-submodules https://github.com/SkoltechSummerCamp/5Gst.git
+    git clone --recursive --recurse-submodules https://github.com/5Gst/5Gst.git
     cd 5Gst/service/
     ```
 
     or
 
     ```bash
-    git clone https://github.com/SkoltechSummerCamp/5Gst.git
+    git clone https://github.com/5Gst/5Gst.git
     cd 5Gst/service/
     git submodule init
     git submodule update

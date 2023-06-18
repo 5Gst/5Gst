@@ -109,12 +109,12 @@ All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*BalancerApi* | [**acquireService**](docs/BalancerApi.md#acquireService) | **POST** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/acquire/ | 
-*BalancerApi* | [**login**](docs/BalancerApi.md#login) | **POST** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/login/ | 
-*BalancerApi* | [**logout**](docs/BalancerApi.md#logout) | **POST** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/logout/ | 
-*BalancerApi* | [**ping**](docs/BalancerApi.md#ping) | **GET** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/ping/ | 
-*BalancerApi* | [**registerService**](docs/BalancerApi.md#registerService) | **POST** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/ | 
-*BalancerApi* | [**unregisterService**](docs/BalancerApi.md#unregisterService) | **DELETE** /Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/ | 
+*BalancerApi* | [**acquireService**](docs/BalancerApi.md#acquireService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/acquire/ | 
+*BalancerApi* | [**login**](docs/BalancerApi.md#login) | **POST** /5gst/iperf_load_balancer/0.1.0/login/ | 
+*BalancerApi* | [**logout**](docs/BalancerApi.md#logout) | **POST** /5gst/iperf_load_balancer/0.1.0/logout/ | 
+*BalancerApi* | [**ping**](docs/BalancerApi.md#ping) | **GET** /5gst/iperf_load_balancer/0.1.0/ping/ | 
+*BalancerApi* | [**registerService**](docs/BalancerApi.md#registerService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/ | 
+*BalancerApi* | [**unregisterService**](docs/BalancerApi.md#unregisterService) | **DELETE** /5gst/iperf_load_balancer/0.1.0/service/ | 
 
 
 ## Documentation for Models
