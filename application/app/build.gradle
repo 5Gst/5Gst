@@ -3,8 +3,8 @@ import java.nio.file.Files
 
 buildscript {
     ext {
-        versionCode = 4
-        versionName = "0.5.0"
+        versionCode = 5
+        versionName = "0.6.0"
     }
 }
 
