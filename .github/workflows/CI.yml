@@ -690,7 +690,7 @@ jobs:
           docker pull 5gst/speedtest-balancer:latest
           docker pull postgres:${POSTGRES_VERSION:-14.4}
           docker save 5gst/speedtest-service:latest | gzip > service.tar.gz
-          docker save 5gst/speedtest-balancer:latest | gzip 5gst balancer.tar.gz
+          docker save 5gst/speedtest-balancer:latest | gzip > balancer.tar.gz
           docker save postgres:${POSTGRES_VERSION:-14.4} | gzip > postgres.tar.gz
 
       - name: upload artifacts
