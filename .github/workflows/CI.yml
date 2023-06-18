@@ -560,7 +560,7 @@ jobs:
           mkdir gh-artifacts
           mv iperf.elf gh-artifacts/
           
-          IPERF_VERSION=$(cat ../iPerf/VERSION)
+          IPERF_VERSION=$(cat ./iPerf/VERSION)
           echo "artifactName=iperf-$IPERF_VERSION.$GITHUB_RUN_NUMBER" > $GITHUB_ENV
 
       - name: Upload iperf binary to artifacts
@@ -588,7 +588,7 @@ jobs:
 
       - name: Setup artifact name in env
         run: |
-          IPERF_VERSION=$(cat ../iPerf/VERSION)
+          IPERF_VERSION=$(cat ./iPerf/VERSION)
           echo "iPerfArtifactName=iperf-$IPERF_VERSION.$GITHUB_RUN_NUMBER" > $GITHUB_ENV
       - uses: actions/download-artifact@v2
         with:
