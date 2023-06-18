@@ -109,7 +109,7 @@ class BalancerApi(object):
         auth_settings = ['5Gst']  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/acquire/', 'POST',
+            '/5gst/iperf_load_balancer/0.1.0/service/acquire/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -200,7 +200,7 @@ class BalancerApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/login/', 'POST',
+            '/5gst/iperf_load_balancer/0.1.0/login/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -291,7 +291,7 @@ class BalancerApi(object):
         auth_settings = ['5Gst']  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/logout/', 'POST',
+            '/5gst/iperf_load_balancer/0.1.0/logout/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -382,7 +382,7 @@ class BalancerApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/ping/', 'GET',
+            '/5gst/iperf_load_balancer/0.1.0/ping/', 'GET',
             path_params,
             query_params,
             header_params,
@@ -481,7 +481,7 @@ class BalancerApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/', 'POST',
+            '/5gst/iperf_load_balancer/0.1.0/service/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -580,7 +580,7 @@ class BalancerApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/', 'DELETE',
+            '/5gst/iperf_load_balancer/0.1.0/service/', 'DELETE',
             path_params,
             query_params,
             header_params,

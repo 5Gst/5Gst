@@ -67,7 +67,7 @@ public class BalancerApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/acquire/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/service/acquire/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -180,7 +180,7 @@ public class BalancerApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/login/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/login/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -293,7 +293,7 @@ public class BalancerApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/logout/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/logout/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -402,7 +402,7 @@ public class BalancerApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/ping/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/ping/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -512,7 +512,7 @@ public class BalancerApi {
         Object localVarPostBody = data;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/service/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -634,7 +634,7 @@ public class BalancerApi {
         Object localVarPostBody = data;
 
         // create path and map variables
-        String localVarPath = "/Skoltech_OpenRAN_5G/iperf_load_balancer/0.1.0/service/";
+        String localVarPath = "/5gst/iperf_load_balancer/0.1.0/service/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
