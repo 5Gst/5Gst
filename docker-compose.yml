@@ -23,7 +23,7 @@ services:
         postgres:
             condition: service_healthy
     healthcheck:
-        test: ["CMD", "curl","-f", "http://${YOUR_IP}:5555/5gst/iperf_load_balancer/0.1.0/ping/"]
+        test: ["CMD", "curl","-f", "http://${SERVER_HOST}:5555/5gst/iperf_load_balancer/0.1.0/ping/"]
         interval: 5s
         timeout: 5s
         retries: 100
@@ -32,11 +32,11 @@ services:
       - SERVICE_URL_SCHEME=${SERVICE_URL_SCHEME-http}
       - SECRET_KEY=${SECRET_KEY-123}
       - DEBUG=${DEBUG-False}
-      - ALLOWED_HOSTS=127.0.0.1,${YOUR_IP}
+      - ALLOWED_HOSTS=127.0.0.1,${SERVER_HOST}
       - DB_NAME=${DB_NAME-5gst_db_name}
       - DB_USER=${DB_USER-5gst_db_user}
       - DB_PASSWORD=${DB_PASS-5gst_db_pass}
-      - DB_HOST=${YOUR_IP}
+      - DB_HOST=${SERVER_HOST}
       - DB_PORT=${DB_PORT-5432}
     ports:
       - "${BALANCER_PORT-5555}:8080"
@@ -50,8 +50,8 @@ services:
         balancer:
             condition: service_healthy
     environment:
-      -  ALLOWED_HOSTS=127.0.0.1,${YOUR_IP}
-      -  BALANCER_ADDRESS=${YOUR_IP}:${BALANCER_PORT-5555}
+      -  ALLOWED_HOSTS=127.0.0.1,${SERVER_HOST}
+      -  BALANCER_ADDRESS=${SERVER_HOST}:${BALANCER_PORT-5555}
       -  BALANCER_BASE_URL=/5gst/iperf_load_balancer/0.1.0
       -  BALANCER_REGISTRATION_INTERVAL_SECONDS=${BALANCER_REGISTRATION_INTERVAL_SECONDS-15.0}
       -  IPERF_MEASUREMENT_MAX_TIME_SECONDS=${IPERF_MEASUREMENT_MAX_TIME_SECONDS-15.0}
@@ -59,7 +59,7 @@ services:
       -  DEBUG=${DEBUG-False}
       -  IPERF_PORT=${IPERF_PORT-5005}
       -  SECRET_KEY=${SECRET_KEY-123}
-      -  SERVICE_IP_ADDRESS=${YOUR_IP}
+      -  SERVICE_IP_ADDRESS=${SERVER_HOST}
       -  SERVICE_PORT=${SERVICE_PORT-5004}
     ports:
       -  "${SERVICE_PORT-5004}:5000"
