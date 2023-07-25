@@ -2,7 +2,7 @@ name: artifact
 
 on: 
     workflow_run:
-        workflows: ["SERVICE___Build_docker_image", "_BALANCER___Publish_docker_image_to_Docker_Hub"]
+        workflows: ["SERVICE___Publish_docker_image_to_Docker_Hub", "_BALANCER___Publish_docker_image_to_Docker_Hub"]
         types:
           - completed
 jobs:
