@@ -1,0 +1,34 @@
+name: artifact
+
+on: 
+    workflow_run:
+        workflows: ["SERVICE___Build_docker_image", "_BALANCER___Publish_docker_image_to_Docker_Hub"]
+        types:
+          - completed
+jobs:
+ make_artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup version variable  
+        run: |
+          echo "version=$(cat ./VERSION)" > $GITHUB_ENV
+      - name: install images and convert to .tar
+        run: |
+          docker pull 5gst/speedtest-service:latest
+          docker pull 5gst/speedtest-balancer:latest
+          docker pull postgres:${POSTGRES_VERSION:-14.4}
+          docker save 5gst/speedtest-service:latest | gzip > service.tar.gz
+          docker save 5gst/speedtest-balancer:latest | gzip > balancer.tar.gz
+          docker save postgres:${POSTGRES_VERSION:-14.4} | gzip > postgres.tar.gz
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: 5gst-selfhost
+          path: |
+            service.tar.gz
+            balancer.tar.gz
+            postgres.tar.gz
+            docker-compose.yml 
+            run-5gst-selfhost.sh 
