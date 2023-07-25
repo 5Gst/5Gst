@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   generate-swagger:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: test
@@ -39,7 +38,6 @@ jobs:
           path: balancer/swagger-balancer.yaml
 
   generate-code:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: generate-swagger
     container: swaggerapi/swagger-codegen-cli:2.4.27
@@ -88,7 +86,6 @@ jobs:
           path: AUTOBUILD-balancer
         
   balancer-push:
-    if: github.event_name == 'push'
     needs: generate-code
     runs-on: ubuntu-latest
     defaults:
