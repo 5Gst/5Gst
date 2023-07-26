@@ -1,0 +1,4 @@
+# 5Gst self-host secrets
+.db.pass
+.balancer.key
+.service.key
