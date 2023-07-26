@@ -1,6 +1,7 @@
 name: "SERVICE___API_service_generation_using_swagger"
 
-on: [push, pull_request]
+on: 
+  workflow_call:
 
 jobs:
   service-generate-swagger:
