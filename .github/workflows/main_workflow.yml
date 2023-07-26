@@ -3,6 +3,28 @@ name: main_workflow
 on: [push, pull_request]
 
 jobs:
+  application-build:
+    name: run application_build workflow
+    uses: ./.github/workflows/application_build.yml
+    
   balancer-api-codegen:
     name: run balancer_api_codegen workflow
     uses: ./.github/workflows/balancer_api_codegen.yml
+  balancer-build-docker:
+    needs: balancer-api-codegen
+    name: run balancer_build_docker workflow
+    uses: ./.github/workflows/balancer_build_docker.yaml
+    
+    
+  service-api-codegen:
+    name: run service_api_codegen workflow
+    uses: ./.github/workflows/service_api_codegen.yml
+  service-build-docker:
+    needs: service-api-codegen
+    name: run service_build_docker workflow
+    uses: ./.github/workflows/service_build_docker.yml
+    
+  making-artifacts:
+    needs: [service-build-docker,balancer-build-docker]
+    name: run making_artifacts workflow
+    uses: ./.github/workflows/making_artifacts.yml
