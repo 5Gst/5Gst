@@ -1,6 +1,8 @@
 name: "BALANCER___API_client_generation_using_swagger"
 
-on: [push, pull_request]
+on: 
+  workflow_call:
+  
 
 jobs:
   generate-swagger:
