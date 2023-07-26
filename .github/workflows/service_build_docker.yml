@@ -1,10 +1,8 @@
 name: "SERVICE___Publish_docker_image_to_Docker_Hub"
 
+
 on: 
-  workflow_run:
-    workflows: ["SERVICE___API_service_generation_using_swagger"]
-    types:
-      - completed
+  workflow_call:
 
 jobs:
   build-iperf:
