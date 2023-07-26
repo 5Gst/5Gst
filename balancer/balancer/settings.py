@@ -199,7 +199,7 @@ SWAGGER_SETTINGS = {
         title="Balancer API",
         default_version='0.1.0',
         description="Speedtest load balancer",
-        contact=openapi.Contact(email=os.getenv("SUPPORT_EMAIL", "and@5gst.ru")),
+        contact=openapi.Contact(email=os.getenv("SUPPORT_EMAIL", "dev@5gst.ru")),
         license=openapi.License(name="BSD 3-Clause",
                                 url='https://raw.githubusercontent.com/5Gst/5Gst/main/LICENSE'),
     ),
