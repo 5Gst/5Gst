@@ -3,9 +3,6 @@ name: main_workflow
 on: [push, pull_request]
 
 jobs:
-  application-build:
-    name: run application_build workflow
-    uses: ./.github/workflows/application_build.yml
   balancer-api-codegen:
     name: run balancer_api_codegen workflow
     uses: ./.github/workflows/balancer_api_codegen.yml
