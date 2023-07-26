@@ -1,48 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/console_layout_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.OptionsActivity"
-    android:orientation="vertical">
+    android:background="@drawable/console_background"
+    android:fillViewport="true"
+    android:layout_margin="10dp"
+    android:padding="10dp"
+    android:scrollbars="vertical">
 
-    <Button
-        android:id="@+id/permitBtn"
+    <TextView
+        android:id="@+id/console_layout_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="40dp"
-        android:backgroundTint="#0f62fe"
-        android:clickable="true"
-        android:text="permit"
-        app:layout_constraintStart_toStartOf="@+id/console_layout_scroll"
-        app:layout_constraintTop_toTopOf="@+id/console_layout_scroll" />
-
-    <ScrollView
-        android:id="@+id/console_layout_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp"
-        android:background="@drawable/console_background"
-        android:fillViewport="true"
-        android:padding="10dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <TextView
-            android:id="@+id/console_layout_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="top"
-            android:textColor="@color/consoleTextColor"
-            android:textIsSelectable="true" />
-    </ScrollView>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:gravity="top"
+        android:textColor="@color/consoleTextColor"
+        android:textIsSelectable="true" />
+</ScrollView>
