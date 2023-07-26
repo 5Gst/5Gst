@@ -10,6 +10,7 @@ import android.telephony.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
@@ -29,6 +30,8 @@ class NetworkInfoTab : Fragment() {
 
     private lateinit var telephonyManager: TelephonyManager
 
+    private  lateinit var permitBtn: Button
+
     private var networkInfoUpdaterJob: Job? = null
 
     override fun onCreateView(
@@ -44,6 +47,8 @@ class NetworkInfoTab : Fragment() {
 
         consoleTextView = view.findViewById(R.id.console_layout_text)
         consoleScrollView = view.findViewById(R.id.console_layout_scroll)
+        permitBtn = view.findViewById(R.id.permitBtn)
+        permitBtn.setOnClickListener {permitRequest()}
 
         listenerPermissionRequester = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
@@ -80,10 +85,22 @@ class NetworkInfoTab : Fragment() {
         }
     }
 
+    private fun permitRequest(){
+        listenerPermissionRequester.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_PHONE_STATE,
+            )
+        )
+        runBlocking {
+            networkInfoUpdaterJob?.cancel()
+        }
+        return
+    }
+
     private fun requestNetworkInfoUpdate() {
         val activity = requireActivity()
-
-        val accessFineLocationPermissionState =
+         val accessFineLocationPermissionState =
             activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         val readPhoneStatePermissionState =
             activity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
@@ -91,39 +108,33 @@ class NetworkInfoTab : Fragment() {
         if (accessFineLocationPermissionState != PackageManager.PERMISSION_GRANTED
             || readPhoneStatePermissionState != PackageManager.PERMISSION_GRANTED
         ) {
-            listenerPermissionRequester.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.READ_PHONE_STATE,
-                )
-            )
-            runBlocking {
-                networkInfoUpdaterJob?.cancel()
-            }
-            return
+            showLoadError("Not enough permissions")
+            permitBtn.visibility = View.VISIBLE
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            telephonyManager.requestCellInfoUpdate(
-                Dispatchers.Main.asExecutor(),
-                object : TelephonyManager.CellInfoCallback() {
-                    override fun onCellInfo(cellInfo: MutableList<CellInfo>) {
-                        updateNetworkInfo(cellInfo)
-                    }
-
-                    override fun onError(errorCode: Int, detail: Throwable?) {
-                        val detailMessage = detail?.let {
-                            ", detail: ${it.message}"
+        else {
+            permitBtn.visibility = View.GONE
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                telephonyManager.requestCellInfoUpdate(
+                    Dispatchers.Main.asExecutor(),
+                    object : TelephonyManager.CellInfoCallback() {
+                        override fun onCellInfo(cellInfo: MutableList<CellInfo>) {
+                            updateNetworkInfo(cellInfo)
                         }
-                        appendLineToConsole(
-                            "Could not update cell info, " +
-                                    "error code is $errorCode$detailMessage"
-                        )
-                    }
-                },
-            )
-        } else {
-            updateNetworkInfo(telephonyManager.allCellInfo)
+
+                        override fun onError(errorCode: Int, detail: Throwable?) {
+                            val detailMessage = detail?.let {
+                                ", detail: ${it.message}"
+                            }
+                            appendLineToConsole(
+                                "Could not update cell info, " +
+                                        "error code is $errorCode$detailMessage"
+                            )
+                        }
+                    },
+                )
+            } else {
+                updateNetworkInfo(telephonyManager.allCellInfo)
+            }
         }
     }
 
