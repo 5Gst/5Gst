@@ -1,10 +1,8 @@
 name: artifact
 
 on: 
-    workflow_run:
-        workflows: ["SERVICE___Publish_docker_image_to_Docker_Hub", "_BALANCER___Publish_docker_image_to_Docker_Hub"]
-        types:
-          - completed
+  workflow_call:
+  
 jobs:
  make_artifacts:
     runs-on: ubuntu-latest
