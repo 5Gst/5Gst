@@ -1,6 +1,7 @@
 name: "APPLICATION_Build_Android_artifacts"
 
-on: [push, pull_request]
+on: 
+  workflow_call:
 
 jobs:
   debug-build:
