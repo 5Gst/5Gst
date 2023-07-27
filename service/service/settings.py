@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'custom_middleware.customlogger.LoggerMiddleware'
 ]
 
 
@@ -129,7 +130,6 @@ class SpeedtestSwaggerAutoSchema(SwaggerAutoSchema):
             tags = [DEFAULT_SWAGGER_TAG]
 
         return tags
-
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': openapi.Info(
