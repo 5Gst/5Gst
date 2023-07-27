@@ -11,15 +11,26 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import kotlin.collections.MapsKt;
 import kotlin.text.StringsKt;
@@ -55,6 +66,56 @@ public class StartActivity extends AppCompatActivity {
 
         init();
     }
+    public HashMap<String, Date> getSuggestFromPrefs(){
+        Gson gson = new Gson();
+        String json =
+        getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+                ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY,
+                null
+        );
+        Type type = new TypeToken<HashMap<String, Date>>(){}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    private void updateSuggest() {
+        LinearLayout suggestList = findViewById(R.id.main_address__suggest_list);
+        suggestList.removeAllViews();
+
+        EditText mainAddress = findViewById(R.id.main_address);
+        String searchValue = String.valueOf(mainAddress.getText());
+
+        HashMap<String, Date> suggestMap = getSuggestFromPrefs();
+
+        List<String> suggestCandidates = suggestMap.entrySet().stream()
+                .filter(entry -> entry.getKey().toLowerCase().contains(searchValue.toLowerCase()))
+                .filter(entry -> !entry.getKey().equals(searchValue))
+                .sorted(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
+                                .getKey().toLowerCase().indexOf(searchValue.toLowerCase()))
+                        .thenComparing(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
+                                .getValue()).reversed()))
+                .map(Map.Entry::getKey)
+                .limit(3)
+                .collect(Collectors.toList());
+
+        updateSuggestBlockVisibility(suggestCandidates.isEmpty());
+        for (int i = 0; i < suggestCandidates.size(); i++) {
+            TextView suggestLine = (TextView) getLayoutInflater().inflate(R.layout.suggest_line,
+                    suggestList,
+                    false);
+
+            suggestLine.setText(suggestCandidates.get(i));
+            if (i % 2 == 1) {
+                suggestLine.setBackgroundColor(ContextCompat.getColor(this, R.color.neutral_10));
+            }
+
+            suggestList.addView(suggestLine, 0);
+            suggestLine.setOnClickListener(v -> mainAddress.setText(suggestLine.getText()));
+        }
+    }
+
+    private void updateSuggestBlockVisibility(boolean isSuggestEmpty) {
+        findViewById(R.id.main_address__suggest_block).setVisibility(isSuggestEmpty ? View.INVISIBLE : View.VISIBLE);
+    }
 
     private void init() {
 
@@ -65,6 +126,7 @@ public class StartActivity extends AppCompatActivity {
                         getString(R.string.default_main_address)
                 )
         );
+        updateSuggest();
         mainAddress.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -87,6 +149,7 @@ public class StartActivity extends AppCompatActivity {
                         newMainAddress.toString()
                 );
                 preferences.apply();
+                updateSuggest();
             }
         });
 
@@ -128,6 +191,11 @@ public class StartActivity extends AppCompatActivity {
 
         ((TextView) Objects.requireNonNull(alert.findViewById(android.R.id.message)))
                 .setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    public void showSuggest(View v) {
+        findViewById(R.id.main_address__suggest).setVisibility(View.VISIBLE);
+        findViewById(R.id.show_suggest_button).setVisibility(View.INVISIBLE);
     }
 
     public void onClick(View v) {
