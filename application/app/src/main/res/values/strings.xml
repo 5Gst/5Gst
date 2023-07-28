@@ -74,4 +74,5 @@
     <string name="setup_pipeline">Setup pipeline</string>
     <string name="add_pipeline">Add pipeline</string>
     <string name="pipeline_name">Pipeline name</string>
+    <string name="pipeline_shared_storage_name">pipeline_shared_storage</string>
 </resources>

@@ -3,22 +3,31 @@ package ru.scoltech.openran.speedtest.activities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
+import ru.scoltech.openran.speedtest.parser.StageConfigurationParserNew
+import ru.scoltech.openran.speedtest.util.ListViewAdapter
 
 
 class SetupPipelineTab : Fragment() {
+
+    private lateinit var addBtn: Button
+    private var arr: ArrayList<StageConfiguration>  =  ArrayList()
+    private lateinit var adapter: ListViewAdapter
+    private lateinit var listView: ListView
+
     companion object {
         private val TAG = SetupPipelineTab::class.java.simpleName
     }
@@ -70,30 +79,21 @@ class SetupPipelineTab : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        addBtn = view.findViewById(R.id.addBtn)
 
-        val pipelineLayout = view.findViewById<LinearLayout>(R.id.new_pipelines)
-
-        val pipelinePreferences = requireActivity().getSharedPreferences(
-            "iperf_args_pipeline",
-            AppCompatActivity.MODE_PRIVATE,
-        )
-
-        stageConfigurationParser.parseFromPreferences(pipelinePreferences, this::getString)
-            .forEach { (preferencesKey, stageConfiguration) ->
-                LayoutInflater.from(requireContext()).inflate(R.layout.stage_sample, pipelineLayout)
-                val stageView = pipelineLayout.children.last()
-
-                val stageNameView = stageView.findViewById<EditText>(R.id.stage_name)
-                val deviceArgsView = stageView.findViewById<EditText>(R.id.device_args)
-                val serverArgsView = stageView.findViewById<EditText>(R.id.server_args)
-
-                stageNameView.setText(stageConfiguration.name)
-                deviceArgsView.setText(stageConfiguration.deviceArgs)
-                serverArgsView.setText(stageConfiguration.serverArgs)
-
-                addSerializationListener(stageNameView, stageView, preferencesKey)
-                addSerializationListener(deviceArgsView, stageView, preferencesKey)
-                addSerializationListener(serverArgsView, stageView, preferencesKey)
-            }
+        listView = view.findViewById<ListView>(R.id.listview)
+        addBtn.setOnClickListener{addStage()}
+        adapter = ListViewAdapter(requireActivity(), StageConfigurationParserNew().getSuggestFromPrefs(activity));
+        listView.adapter = adapter
     }
+
+
+    private fun addStage(){
+        adapter.add(StageConfiguration("New Stage","",""));
+        adapter.notifyDataSetChanged()
+        StageConfigurationParserNew().saveSuggestToPrefs(activity,adapter.convertToMap())
+        listView.setSelection(adapter.count-1)
+
+    }
+
 }
