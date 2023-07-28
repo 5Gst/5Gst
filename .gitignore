@@ -2,3 +2,6 @@
 .db.pass
 .balancer.key
 .service.key
+
+# IntelliJ IDEA local configuration directory
+/.idea/

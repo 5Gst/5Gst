@@ -1,6 +1,22 @@
 # SpeedtestApplication
 
-## Project setup
+## Development setup
+
+### Project download
+
+Make sure to clone git submodules of the repository
+
+```bash
+git clone --recurse-submodules https://github.com/5Gst/5Gst.git
+```
+
+Or initialize them after the clone
+
+```bash
+git clone https://github.com/5Gst/5Gst.git
+git submodule init
+git submodule update
+```
 
 ### Local configuration
 

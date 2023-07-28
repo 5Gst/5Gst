@@ -1,95 +1,61 @@
 # SpeedtestService
 
-## How To Build Service
+## Local setup
 
-1. Clone main repo
+1. Make sure to clone git submodules of the repository
 
-    ```bash
-    git clone --recursive --recurse-submodules https://github.com/5Gst/5Gst.git
-    cd 5Gst/service/
-    ```
+   ```bash
+   git clone --recurse-submodules https://github.com/5Gst/5Gst.git
+   ```
 
-    or
+   Or initialize them after the clone
 
-    ```bash
-    git clone https://github.com/5Gst/5Gst.git
-    cd 5Gst/service/
-    git submodule init
-    git submodule update
-    ```
+   ```bash
+   git clone https://github.com/5Gst/5Gst.git
+   git submodule init
+   git submodule update
+   ```
 
-    **iPerf binary is placed in the same directory as `iperf_wrapper.py` script.**
+2. Build iPerf
 
-    > Don't foget to `git checkout BRANCH` to your branch.
+   ```bash
+   cd scripts
+   ./build-iperf.sh
+   ```
 
-2. Build Iperf
+3. Install pipenv virtual environment
 
-    `./scripts/build-iperf.sh`
+   ```bash
+   # installing pipenv with insertion into PATH variable
+   sudo -H pip3 install -U pipenv
 
-3. Setup environment variables
+   # --python setting is needed if Pipfile python version differs from local python version
+   pipenv --python /usr/bin/python3 install --dev
+   ```
 
-    ```bash
-    YOU_IP=;        #specify your ip
-    BALANCER_IP=;   #specify balancer ip
-    BALANCER_PORT=; #specify balancer port
+4. Activate pipenv environment
 
-    export ALLOWED_HOSTS=127.0.0.1,$YOU_IP; # Hosts on which you want to start service
-    export BALANCER_ADDRESS=http://$BALANCER_IP:$BALANCER_PORT;
-    export DEBUG=True;
-    export DJANGO_SETTINGS_MODULE=service.settings;
-    export IPERF_PORT=5005;
-    export SECRET_KEY=123;
-    export SERVICE_IP_ADDRESS=$YOU_IP;
-    export SERVICE_PORT=5004
-    ```
+   ```bash
+   pipenv --python /usr/bin/python3 shell
+   ```
 
-4. Install everything from Pipfile
+5. Setup environment variables
 
-    ```bash
-    pipenv install --dev #if not installed, use: `sudo pip install pipenv`
-    pipenv shell # to exit: `deactivate`
-    ```
+   ```bash
+   # Specify server host if needed
+   export SERVER_HOST=127.0.0.1 
 
-5. Run python
+   export ALLOWED_HOSTS="127.0.0.1,$SERVER_HOST"
+   export BALANCER_ADDRESS="http://$SERVER_HOST:5555"
+   export DEBUG=True
+   export IPERF_PORT=5005
+   export SECRET_KEY=$(openssl rand -hex 32)
+   export SERVICE_IP_ADDRESS="$SERVER_HOST"
+   export SERVICE_PORT=5004
+   ```
 
-    ```bash
-    python3 manage.py runserver $SERVICE_IP_ADDRESS:5004
-    ```
+6. Start server
 
-## Usage
-
-**iPerf binary is placed in the same directory as `iperf_wrapper.py` script.**
-
-The server listens port `5000` and can handle the following GET requests:
-
-* start-iperf
-* stop-iperf
-
-> Set environment variables for IPERF_PORT and SERVICE_PORT, to allow multiple service on one server 
-
-### start-iperf GET request
-
-To start the iPerf with parameters, specified in `args`.
-
-```bash
-http://localhost:5000/start-iperf?args=-s%20-t%2010
-```
-
-If request has no `args`, iPerf will start with `-s -u` parameters.
-
-If iPerf is already running, it will restart with new `args`.
-
-### stop-iperf GET request
-
-Stop the iPerf process.
-
-```bash
-http://localhost:5000/stop-iperf
-```
-
-## How To Use Docker (example)
-
-
-```bash
-./docker_build.sh
-docker run -d -e BALANCER_ADDRESS=http://192.168.1.12:5555 -e SERVICE_IP_ADDRESS=192.168.1.12 -e SERVICE_PORT=5004 -e IPERF_PORT=5005 -p 5004:5000 -p 5005:5001 -p 5005:5001/udp -e ALLOWED_HOSTS=192.168.1.12 -e DEBUG=True -e DJANGO_SETTINGS_MODULE=service.settings -e SECRET_KEY=123 docker_service:latest
+   ```bash
+   python manage.py runserver 0.0.0.0:5004
+   ```
