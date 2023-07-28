@@ -26,7 +26,6 @@ import ru.scoltech.openran.speedtest.customViews.ResultView;
 import ru.scoltech.openran.speedtest.customViews.SubResultView;
 import ru.scoltech.openran.speedtest.domain.SpeedTestResult;
 import ru.scoltech.openran.speedtest.manager.DownloadUploadSpeedTestManager;
-import ru.scoltech.openran.speedtest.parser.StageConfigurationParser;
 import ru.scoltech.openran.speedtest.parser.StageConfigurationParserNew;
 
 
