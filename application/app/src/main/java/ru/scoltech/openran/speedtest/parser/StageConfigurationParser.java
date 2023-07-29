@@ -65,8 +65,8 @@ public class StageConfigurationParser {
             Boolean isFirstTime = getFromPrefs(context,R.string.pipeline_shared_storage_name,"firstTime",Boolean.class);
             if (isFirstTime == null) {
                 saveFirstTimeToPrefs(context);
-                configurations.add(new StageConfiguration("Download Speed Test", "-u", "-u -R -P 10 -b 120m"));
-                configurations.add(new StageConfiguration("Upload Speed Test", "", "-P 10 -b 120m"));
+                configurations.add(new StageConfiguration("Download Speed Test", context.getString(R.string.download_server_iperf_args), context.getString(R.string.download_device_iperf_args)));
+                configurations.add(new StageConfiguration("Upload Speed Test", context.getString(R.string.upload_server_iperf_args), context.getString(R.string.upload_device_iperf_args)));
                 saveStageToPrefs(context,configurations);
             }
             return configurations;
