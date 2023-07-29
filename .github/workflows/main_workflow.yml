@@ -24,7 +24,7 @@ jobs:
     name: run service_build_docker workflow
     uses: ./.github/workflows/service_build_docker.yml
     
-  making-artifacts:
+  make-artifacts:
     needs: [service-build-docker,balancer-build-docker]
-    name: run making_artifacts workflow
-    uses: ./.github/workflows/making_artifacts.yml
+    name: run make_artifacts workflow
+    uses: ./.github/workflows/make_artifacts.yml
