@@ -29,4 +29,5 @@ jobs:
             balancer.tar.gz
             postgres.tar.gz
             docker-compose.yml 
+            load-5gst-selfhost.sh
             run-5gst-selfhost.sh 
