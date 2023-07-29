@@ -9,7 +9,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
-import ru.scoltech.openran.speedtest.parser.StageConfigurationParserNew
+import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
 import ru.scoltech.openran.speedtest.util.ListViewAdapter
 
 
@@ -38,7 +38,7 @@ class SetupPipelineTab : Fragment() {
 
         listView = view.findViewById<ListView>(R.id.listview)
         addBtn.setOnClickListener{addStage()}
-        adapter = ListViewAdapter(requireActivity(), StageConfigurationParserNew().getSuggestFromPrefs(activity));
+        adapter = ListViewAdapter(requireActivity(), StageConfigurationParser().getStageFromPrefs(activity));
         listView.adapter = adapter
     }
 
@@ -46,7 +46,7 @@ class SetupPipelineTab : Fragment() {
     private fun addStage(){
         adapter.add(StageConfiguration("New Stage","",""));
         adapter.notifyDataSetChanged()
-        StageConfigurationParserNew().saveSuggestToPrefs(activity,adapter.convertToMap())
+        StageConfigurationParser().saveStageToPrefs(activity,adapter.getData())
         listView.setSelection(adapter.count-1)
 
     }

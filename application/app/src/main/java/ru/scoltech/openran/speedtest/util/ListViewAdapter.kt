@@ -12,7 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
-import ru.scoltech.openran.speedtest.parser.StageConfigurationParserNew
+import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
 
 class ListViewAdapter(private val context: Activity, private val data: ArrayList<StageConfiguration>): ArrayAdapter<StageConfiguration>(context, R.layout.stage_sample, data) {
 
@@ -31,37 +31,30 @@ class ListViewAdapter(private val context: Activity, private val data: ArrayList
 
         stageName.addTextChangedListener {
             data[position].name = stageName.text.toString();
-            StageConfigurationParserNew().saveSuggestToPrefs(context,this.convertToMap())
+            StageConfigurationParser().saveStageToPrefs(context,data)
         }
         deviceArgs.addTextChangedListener {
             data[position].deviceArgs = deviceArgs.text.toString();
-            StageConfigurationParserNew().saveSuggestToPrefs(context,this.convertToMap())
+            StageConfigurationParser().saveStageToPrefs(context,data)
         }
         serviceArgs.addTextChangedListener {
             data[position].serverArgs = serviceArgs.text.toString();
-            StageConfigurationParserNew().saveSuggestToPrefs(context,this.convertToMap())
+            StageConfigurationParser().saveStageToPrefs(context,data)
         }
 
         imgBtn.setOnClickListener{
             data.removeAt(position);
+            StageConfigurationParser().saveStageToPrefs(context,data)
             this.notifyDataSetChanged()
         };
 
         return listViewNode
     }
 
-    private fun delElem(){
-
-    }
-
     private fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)
 
-    public fun convertToMap( ): HashMap<String, StageConfiguration> {
-        var map: HashMap<String, StageConfiguration> = HashMap()
-        for ( stage in  data){
-            map.put(stage.name,stage)
-        }
-        return map
+    public fun getData(): List<StageConfiguration>{
+        return data
     }
 
 

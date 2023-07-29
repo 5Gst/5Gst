@@ -26,7 +26,7 @@ import ru.scoltech.openran.speedtest.customViews.ResultView;
 import ru.scoltech.openran.speedtest.customViews.SubResultView;
 import ru.scoltech.openran.speedtest.domain.SpeedTestResult;
 import ru.scoltech.openran.speedtest.manager.DownloadUploadSpeedTestManager;
-import ru.scoltech.openran.speedtest.parser.StageConfigurationParserNew;
+import ru.scoltech.openran.speedtest.parser.StageConfigurationParser;
 
 
 public class SpeedActivity extends AppCompatActivity {
@@ -44,7 +44,7 @@ public class SpeedActivity extends AppCompatActivity {
 
     private SpeedManager sm;
     private DownloadUploadSpeedTestManager speedTestManager;
-    private final StageConfigurationParserNew stageConfigurationParser = new StageConfigurationParserNew();
+    private final StageConfigurationParser stageConfigurationParser = new StageConfigurationParser();
 
     private final static String LOG_TAG = SpeedActivity.class.getSimpleName();
     private final static int TASK_DELAY = 2500;
@@ -193,7 +193,7 @@ public class SpeedActivity extends AppCompatActivity {
                 ),
                 TASK_DELAY,
 
-                stageConfigurationParser.getSuggestFromPrefs(this)
+                stageConfigurationParser.getStageFromPrefs(this)
         );
     }
 
