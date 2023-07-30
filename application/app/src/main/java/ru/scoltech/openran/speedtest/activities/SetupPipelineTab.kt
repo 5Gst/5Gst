@@ -10,15 +10,15 @@ import androidx.fragment.app.Fragment
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
-import ru.scoltech.openran.speedtest.util.ListViewAdapter
+import ru.scoltech.openran.speedtest.util.StageConfigurationListViewAdapter
 
 
 class SetupPipelineTab : Fragment() {
 
-    private lateinit var addBtn: Button
-    private var arr: ArrayList<StageConfiguration>  =  ArrayList()
-    private lateinit var adapter: ListViewAdapter
+    private lateinit var addButton: Button
+    private lateinit var adapter: StageConfigurationListViewAdapter
     private lateinit var listView: ListView
+    private var stageConfigurationParser = StageConfigurationParser()
 
     companion object {
         private val TAG = SetupPipelineTab::class.java.simpleName
@@ -34,20 +34,29 @@ class SetupPipelineTab : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        addBtn = view.findViewById(R.id.addBtn)
+        addButton = view.findViewById(R.id.addBtn)
 
         listView = view.findViewById<ListView>(R.id.listview)
-        addBtn.setOnClickListener{addStage()}
-        adapter = ListViewAdapter(requireActivity(), StageConfigurationParser().getStageFromPrefs(activity));
+        addButton.setOnClickListener { addStage() }
+        adapter = StageConfigurationListViewAdapter(
+            requireActivity(),
+            stageConfigurationParser.getStageFromPrefs(activity)
+        );
         listView.adapter = adapter
     }
 
 
-    private fun addStage(){
-        adapter.add(StageConfiguration("New Stage","",""));
+    private fun addStage() {
+        adapter.add(
+            StageConfiguration(
+                name = "New Stage",
+                serverArgs = "",
+                deviceArgs = ""
+            )
+        );
         adapter.notifyDataSetChanged()
-        StageConfigurationParser().saveStageToPrefs(activity,adapter.getData())
-        listView.setSelection(adapter.count-1)
+        stageConfigurationParser.saveStageToPrefs(activity, adapter.getData())
+        listView.setSelection(adapter.count - 1)
 
     }
 

@@ -1,9 +1,9 @@
 package ru.scoltech.openran.speedtest.domain
 
 data class StageConfiguration(
-    var name: String,
-    var serverArgs: String,
-    var deviceArgs: String,
+    val name: String,
+    val serverArgs: String,
+    val deviceArgs: String,
 ) {
     companion object {
         val EMPTY = StageConfiguration("", "", "")
