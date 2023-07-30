@@ -97,15 +97,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:maxHeight="100dp"
-                                android:orientation="vertical"
-                                >
-                                <!--
-                                <include layout="@layout/suggest_line"/>
-                                <include layout="@layout/suggest_line"/>
-                                <include layout="@layout/suggest_line"/>
-                                -->
-
-                            </LinearLayout>
+                                android:orientation="vertical"/>
                         </androidx.cardview.widget.CardView>
                         <ImageButton
                             android:id="@+id/show_suggest_button"

@@ -1,22 +1,13 @@
 package ru.scoltech.openran.speedtest.activities;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import kotlin.Unit;
@@ -56,7 +47,6 @@ public class SpeedActivity extends AppCompatActivity {
 
     private final static String LOG_TAG = SpeedActivity.class.getSimpleName();
     private final static int TASK_DELAY = 2500;
-    private final static int SUGGEST_STORAGE_LIMIT = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,25 +162,6 @@ public class SpeedActivity extends AppCompatActivity {
         saveBtn.setVisibility(View.VISIBLE);
 
     }
-    public void saveSuggestToPrefs(HashMap<String, Date> map){
-        SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(map);
-        prefEditor.putString(ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY, json);
-        prefEditor.apply();
-
-    }
-
-    public HashMap<String, Date> getSuggestFromPrefs(){
-        Gson gson = new Gson();
-        String json =
-                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
-                        ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY,
-                        null
-                );
-        Type type = new TypeToken<HashMap<String, Date>>(){}.getType();
-        return gson.fromJson(json, type);
-    }
 
     public void onPlayUI() {
         mCard.setDefaultCaptions();
@@ -211,35 +182,15 @@ public class SpeedActivity extends AppCompatActivity {
 
         sm.flushResults();
 
-        String mainAddress =
-                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
-                    ApplicationConstants.MAIN_ADDRESS_KEY,
-                    getString(R.string.default_main_address)
-                );
-
-        HashMap<String, Date> suggestMap = getSuggestFromPrefs();
-
-        suggestMap.put(mainAddress, new Date());
-        while (suggestMap.size() > 10) {
-            Date oldestDate = null;
-            String oldestKey = null;
-            for(Map.Entry<String, Date> entry : suggestMap.entrySet()) {
-                if (oldestDate == null || oldestDate.after(entry.getValue())) {
-                    oldestDate = entry.getValue();
-                    oldestKey = entry.getKey();
-                }
-            }
-            suggestMap.remove(oldestKey);
-        }
-
-        saveSuggestToPrefs(suggestMap);
-
         speedTestManager.start(
                 getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getBoolean(
                         ApplicationConstants.USE_BALANCER_KEY,
                         true
                 ),
-                mainAddress,
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+                        ApplicationConstants.MAIN_ADDRESS_KEY,
+                        getString(R.string.default_main_address)
+                ),
                 TASK_DELAY,
                 stageConfigurationParser
                         .parseFromPreferences(

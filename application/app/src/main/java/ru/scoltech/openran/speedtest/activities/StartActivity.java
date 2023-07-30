@@ -40,6 +40,9 @@ import ru.scoltech.openran.speedtest.R;
 
 public class StartActivity extends AppCompatActivity {
     private static final String TAG = StartActivity.class.getSimpleName();
+    private static final int SUGGEST_STORAGE_LIMIT = 10;
+    private static final int SUGGEST_UI_LIMIT = 3;
+    private static final Gson GSON_CONSTRUCTOR = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,15 +69,21 @@ public class StartActivity extends AppCompatActivity {
 
         init();
     }
-    public HashMap<String, Date> getSuggestFromPrefs(){
-        Gson gson = new Gson();
-        String json =
-        getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+    public void saveSuggestToPrefs(Map<String, Date> map){
+        SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).edit();
+        String json = GSON_CONSTRUCTOR.toJson(map);
+        prefEditor.putString(ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY, json);
+        prefEditor.apply();
+
+    }
+
+    public Map<String, Date> getSuggestFromPrefs(){
+        String json = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                 ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY,
-                null
+                GSON_CONSTRUCTOR.toJson(new HashMap<String, Date>())
         );
-        Type type = new TypeToken<HashMap<String, Date>>(){}.getType();
-        return gson.fromJson(json, type);
+        Type type = new TypeToken<Map<String, Date>>(){}.getType();
+        return GSON_CONSTRUCTOR.fromJson(json, type);
     }
 
     private void updateSuggest() {
@@ -84,17 +93,15 @@ public class StartActivity extends AppCompatActivity {
         EditText mainAddress = findViewById(R.id.main_address);
         String searchValue = String.valueOf(mainAddress.getText());
 
-        HashMap<String, Date> suggestMap = getSuggestFromPrefs();
+        Map<String, Date> suggestMap = getSuggestFromPrefs();
 
         List<String> suggestCandidates = suggestMap.entrySet().stream()
                 .filter(entry -> entry.getKey().toLowerCase().contains(searchValue.toLowerCase()))
-                .filter(entry -> !entry.getKey().equals(searchValue))
-                .sorted(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
+                .sorted(Comparator.<Map.Entry<String, Date>>comparingInt(entry -> entry
                                 .getKey().toLowerCase().indexOf(searchValue.toLowerCase()))
-                        .thenComparing(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
-                                .getValue()).reversed()))
+                        .thenComparing(Map.Entry.<String, Date>comparingByValue().reversed()))
                 .map(Map.Entry::getKey)
-                .limit(3)
+                .limit(SUGGEST_UI_LIMIT)
                 .collect(Collectors.toList());
 
         updateSuggestBlockVisibility(suggestCandidates.isEmpty());
@@ -199,6 +206,22 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
+        String mainAddress =
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+                        ApplicationConstants.MAIN_ADDRESS_KEY,
+                        getString(R.string.default_main_address)
+                );
+
+        Map<String, Date> suggestMap = getSuggestFromPrefs();
+
+        suggestMap.put(mainAddress, new Date());
+        saveSuggestToPrefs(
+                suggestMap.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue())
+                        .limit(SUGGEST_STORAGE_LIMIT)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+
         Intent intent = new Intent(this, SpeedActivity.class);
         startActivity(intent);
     }
