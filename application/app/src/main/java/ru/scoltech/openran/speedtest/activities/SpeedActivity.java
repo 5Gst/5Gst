@@ -210,7 +210,6 @@ public class SpeedActivity extends AppCompatActivity {
         saveBtn.setVisibility(View.GONE);
 
         sm.flushResults();
-
         String mainAddress =
                 getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                     ApplicationConstants.MAIN_ADDRESS_KEY,
