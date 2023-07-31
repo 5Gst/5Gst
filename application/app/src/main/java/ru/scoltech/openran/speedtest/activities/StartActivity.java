@@ -40,6 +40,9 @@ import ru.scoltech.openran.speedtest.R;
 
 public class StartActivity extends AppCompatActivity {
     private static final String TAG = StartActivity.class.getSimpleName();
+    private static final int SUGGEST_STORAGE_LIMIT = 10;
+    private static final int SUGGEST_UI_LIMIT = 3;
+    private static final Gson GSON_CONSTRUCTOR = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,15 +69,23 @@ public class StartActivity extends AppCompatActivity {
 
         init();
     }
-    public HashMap<String, Date> getSuggestFromPrefs(){
-        Gson gson = new Gson();
-        String json =
-        getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+
+    public void saveSuggestToPrefs(Map<String, Date> map) {
+        SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
+        String json = GSON_CONSTRUCTOR.toJson(map);
+        prefEditor.putString(ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY, json);
+        prefEditor.apply();
+
+    }
+
+    public Map<String, Date> getSuggestFromPrefs() {
+        String json = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                 ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY,
-                null
+                GSON_CONSTRUCTOR.toJson(new HashMap<String, Date>())
         );
-        Type type = new TypeToken<HashMap<String, Date>>(){}.getType();
-        return gson.fromJson(json, type);
+        Type type = new TypeToken<Map<String, Date>>() {
+        }.getType();
+        return GSON_CONSTRUCTOR.fromJson(json, type);
     }
 
     private void updateSuggest() {
@@ -84,17 +95,15 @@ public class StartActivity extends AppCompatActivity {
         EditText mainAddress = findViewById(R.id.main_address);
         String searchValue = String.valueOf(mainAddress.getText());
 
-        HashMap<String, Date> suggestMap = getSuggestFromPrefs();
+        Map<String, Date> suggestMap = getSuggestFromPrefs();
 
         List<String> suggestCandidates = suggestMap.entrySet().stream()
                 .filter(entry -> entry.getKey().toLowerCase().contains(searchValue.toLowerCase()))
-                .filter(entry -> !entry.getKey().equals(searchValue))
-                .sorted(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
+                .sorted(Comparator.<Map.Entry<String, Date>>comparingInt(entry -> entry
                                 .getKey().toLowerCase().indexOf(searchValue.toLowerCase()))
-                        .thenComparing(Comparator.comparing(entry -> ((Map.Entry<String, Date>)entry)
-                                .getValue()).reversed()))
+                        .thenComparing(Map.Entry.<String, Date>comparingByValue().reversed()))
                 .map(Map.Entry::getKey)
-                .limit(3)
+                .limit(SUGGEST_UI_LIMIT)
                 .collect(Collectors.toList());
 
         updateSuggestBlockVisibility(suggestCandidates.isEmpty());
@@ -121,7 +130,7 @@ public class StartActivity extends AppCompatActivity {
 
         final EditText mainAddress = findViewById(R.id.main_address);
         mainAddress.setText(
-                getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).getString(
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                         ApplicationConstants.MAIN_ADDRESS_KEY,
                         getString(R.string.default_main_address)
                 )
@@ -141,9 +150,9 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                final CharSequence newMainAddress = StringsKt.isBlank(s)? getString(R.string.default_main_address) : s;
+                final CharSequence newMainAddress = StringsKt.isBlank(s) ? getString(R.string.default_main_address) : s;
 
-                SharedPreferences.Editor preferences = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).edit();
+                SharedPreferences.Editor preferences = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
                 preferences.putString(
                         ApplicationConstants.MAIN_ADDRESS_KEY,
                         newMainAddress.toString()
@@ -155,7 +164,7 @@ public class StartActivity extends AppCompatActivity {
 
         final RadioGroup modeRadioGroup = findViewById(R.id.mode_radio_group);
         modeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            SharedPreferences.Editor preferences = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).edit();
+            SharedPreferences.Editor preferences = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
             preferences.putBoolean(
                     ApplicationConstants.USE_BALANCER_KEY,
                     checkedId == R.id.balancer_mode
@@ -163,18 +172,18 @@ public class StartActivity extends AppCompatActivity {
             preferences.apply();
         });
 
-        final boolean useBalancer = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE)
-                                    .getBoolean(ApplicationConstants.USE_BALANCER_KEY, true);
+        final boolean useBalancer = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE)
+                .getBoolean(ApplicationConstants.USE_BALANCER_KEY, true);
         if (useBalancer) {
             this.<RadioButton>findViewById(R.id.balancer_mode).setChecked(true);
         } else {
             this.<RadioButton>findViewById(R.id.direct_mode).setChecked(true);
         }
 
-        boolean checkPrivacy = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).getBoolean(ApplicationConstants.PRIVACY_SHOWN, false);
-        Log.d(TAG,"PRIVACY pref="+checkPrivacy);
+        boolean checkPrivacy = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getBoolean(ApplicationConstants.PRIVACY_SHOWN, false);
+        Log.d(TAG, "PRIVACY pref=" + checkPrivacy);
         if (!checkPrivacy) {
-            SharedPreferences.Editor preferencesEditor = getSharedPreferences(getString(R.string.globalSharedPreferences),MODE_PRIVATE).edit();
+            SharedPreferences.Editor preferencesEditor = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
             preferencesEditor.putBoolean(ApplicationConstants.PRIVACY_SHOWN, true);
             preferencesEditor.apply();
             findViewById(R.id.main_layout).post(this::showPrivacyPopUp);
@@ -199,6 +208,22 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
+        String mainAddress =
+                getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+                        ApplicationConstants.MAIN_ADDRESS_KEY,
+                        getString(R.string.default_main_address)
+                );
+
+        Map<String, Date> suggestMap = getSuggestFromPrefs();
+
+        suggestMap.put(mainAddress, new Date());
+        saveSuggestToPrefs(
+                suggestMap.entrySet().stream()
+                        .sorted(Map.Entry.<String, Date>comparingByValue().reversed())
+                        .limit(SUGGEST_STORAGE_LIMIT)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+
         Intent intent = new Intent(this, SpeedActivity.class);
         startActivity(intent);
     }

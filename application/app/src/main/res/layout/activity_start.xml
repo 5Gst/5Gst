@@ -77,51 +77,46 @@
 
                         app:layout_constraintRight_toLeftOf="@+id/main_address"
                         app:layout_constraintTop_toTopOf="@id/main_address" />
+
                     <FrameLayout
                         android:id="@+id/main_address__suggest_block"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintLeft_toRightOf="@+id/main_address_hint"
                         app:layout_constraintBottom_toTopOf="@id/main_address"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent">
+                        app:layout_constraintLeft_toRightOf="@+id/main_address_hint"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/main_address__suggest"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
-                            android:visibility="invisible"
-                            android:layout_margin="5dp">
+                            android:layout_margin="5dp"
+                            android:visibility="invisible">
+
                             <LinearLayout
                                 android:id="@+id/main_address__suggest_list"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:maxHeight="100dp"
-                                android:orientation="vertical"
-                                >
-                                <!--
-                                <include layout="@layout/suggest_line"/>
-                                <include layout="@layout/suggest_line"/>
-                                <include layout="@layout/suggest_line"/>
-                                -->
-
-                            </LinearLayout>
+                                android:orientation="vertical" />
                         </androidx.cardview.widget.CardView>
+
                         <ImageButton
                             android:id="@+id/show_suggest_button"
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
                             android:layout_gravity="bottom"
 
-                            android:src="@drawable/round_expand_less_24"
                             android:backgroundTint="@color/neutral_10"
-                            app:tint="@color/neutral_60"
                             android:contentDescription="@string/show_suggestions"
-
                             android:onClick="showSuggest"
-                            android:visibility="visible"/>
-                    </FrameLayout>
+                            android:src="@drawable/round_expand_less_24"
 
+                            android:visibility="visible"
+                            app:tint="@color/neutral_60" />
+                    </FrameLayout>
 
 
                     <EditText
@@ -194,10 +189,9 @@
 
                 android:gravity="center"
                 android:orientation="horizontal"
-                tools:layout_editor_absoluteX="0dp"
-                tools:layout_editor_absoluteY="7dp"
                 app:layout_constraintTop_toTopOf="parent"
-                >
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="7dp">
 
                 <ru.scoltech.openran.speedtest.customButtons.ActionButton
                     android:id="@+id/action_btn"
