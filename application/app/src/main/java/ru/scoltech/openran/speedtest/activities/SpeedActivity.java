@@ -182,7 +182,6 @@ public class SpeedActivity extends AppCompatActivity {
         saveBtn.setVisibility(View.GONE);
 
         sm.flushResults();
-
         speedTestManager.start(
                 getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getBoolean(
                         ApplicationConstants.USE_BALANCER_KEY,
