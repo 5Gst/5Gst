@@ -6,6 +6,15 @@ logger = logging.getLogger(__name__)
 
 class FiveGstLoggerMiddleware:
     # noinspection PyMethodMayBeStatic
+    # This method's purpose is to get client ip even if nginx or apache reverse proxy will be configured in future
+    # It's only special usage is here. No need to call it from anywhere else.
+    def __uncover_sender_ip(self, request):
+        forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        if forwarded:
+            return forwarded
+        return request.META.get('REMOTE_ADDR')
+
+    # noinspection PyMethodMayBeStatic
     # Logging method choice varies on DEBUG value in settings.
     # So it should always be called with class instance where DEBUG status is checked due initialization.
     def __nonsensitive_log(self, request):
@@ -13,6 +22,7 @@ class FiveGstLoggerMiddleware:
                              'FROM_PATH': request.META.get('PATH_INFO'),
                              'PORT': request.META.get('SERVER_PORT'),
                              'HTTPS': request.is_secure(),
+                             'SENDER_ADDR': self.__uncover_sender_ip(request),
                              'CONTENT_TYPE': request.META.get('CONTENT_TYPE'),
                              }
         logger.info(f"*> Request data: {nonsensitive_data}")
