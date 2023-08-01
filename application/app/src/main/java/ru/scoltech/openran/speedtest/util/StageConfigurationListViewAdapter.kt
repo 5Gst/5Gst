@@ -8,15 +8,17 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.core.widget.addTextChangedListener
+import org.apache.commons.collections.list.SynchronizedList
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
+import java.util.Collections
 
 class StageConfigurationListViewAdapter(
     private val context: Activity,
-    private val data: MutableList<StageConfiguration>
+    data: MutableList<StageConfiguration>
 ) : ArrayAdapter<StageConfiguration>(context, R.layout.stage_sample, data) {
-
+    private val data  = Collections.synchronizedList(data)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val inflater = context.layoutInflater
         val listViewNode = inflater.inflate(R.layout.stage_sample, null, true);
