@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from apps import serializers
 from apps.logic.iperf_wrapper import iperf
+from apps.logic.utils.custom_exceptions import BadRequest
 from apps.logic.watchdog import WatchdogService
 from apps.logic.watchdog_service import balancer_communication_watchdog_service, iperf_stop_watchdog_service
 from service import settings
@@ -65,7 +66,7 @@ class SessionWebService:
 
     def start_iperf(self, iperf_args: str) -> Response:
         if not self._is_in_session:
-            return Response("Not in session", status=status.HTTP_400_BAD_REQUEST)
+            raise BadRequest("Not in session")
 
         self._stop_watchdog_service.reset_timer()
 
@@ -86,7 +87,7 @@ class SessionWebService:
 
     def stop_iperf(self) -> Response:
         if not self._is_in_session:
-            return Response("Not in session", status=status.HTTP_400_BAD_REQUEST)
+            raise BadRequest("Not in session")
 
         status_code = iperf.stop()
         if status_code != 0:
