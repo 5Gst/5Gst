@@ -14,7 +14,7 @@ import ru.scoltech.openran.speedtest.parser.StageConfigurationParser
 
 class StageConfigurationListViewAdapter(
     private val context: Activity,
-    private val data: ArrayList<StageConfiguration>
+    private val data: MutableList<StageConfiguration>
 ) : ArrayAdapter<StageConfiguration>(context, R.layout.stage_sample, data) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {

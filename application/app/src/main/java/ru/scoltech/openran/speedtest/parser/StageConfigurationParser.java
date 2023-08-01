@@ -29,7 +29,7 @@ public class StageConfigurationParser {
         prefEditor.apply();
     }
 
-    public ArrayList<StageConfiguration> getStageFromPrefs(Context context) {
+    public List<StageConfiguration> getStageFromPrefs(Context context) {
         if (context.getSharedPreferences(context.getString(R.string.pipeline_shared_storage_name), MODE_PRIVATE).contains(context.getString(R.string.stage_field_name))) {
             String json = context.getSharedPreferences(context.getString(R.string.pipeline_shared_storage_name), MODE_PRIVATE).getString(
                     context.getString(R.string.stage_field_name),
@@ -41,6 +41,5 @@ public class StageConfigurationParser {
                 new StageConfiguration("Download Speed Test", context.getString(R.string.download_server_iperf_args), context.getString(R.string.download_device_iperf_args)),
                 new StageConfiguration("Upload Speed Test", context.getString(R.string.upload_server_iperf_args), context.getString(R.string.upload_device_iperf_args))
         ));
-
     }
 }
