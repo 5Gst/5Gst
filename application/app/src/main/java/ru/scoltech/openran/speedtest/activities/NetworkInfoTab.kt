@@ -3,10 +3,14 @@ package ru.scoltech.openran.speedtest.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.telephony.*
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +20,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.*
 import ru.scoltech.openran.speedtest.R
@@ -56,7 +61,7 @@ class NetworkInfoTab : Fragment() {
             if (permissions.values.all { it }) {
                 launchNetworkInfoUpdaterJob()
             } else {
-                showLoadError("Not enough permissions")
+                showLoadError(activity.getString(R.string.permissions_error))
             }
         }
 
@@ -86,15 +91,33 @@ class NetworkInfoTab : Fragment() {
     }
 
     private fun requestPermissions() {
-        listenerPermissionRequester.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.READ_PHONE_STATE,
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) ||
+            !ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
             )
-        )
+        ) {
+            listenerPermissionRequester.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.READ_PHONE_STATE,
+                )
+            )
+        } else {
+            var settings = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + activity?.packageName)
+            )
+            settings.addCategory(Intent.CATEGORY_DEFAULT)
+            settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(settings)
+
+        }
         runBlocking {
             networkInfoUpdaterJob?.cancel()
         }
+
         return
     }
 
@@ -104,11 +127,10 @@ class NetworkInfoTab : Fragment() {
             activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         val readPhoneStatePermissionState =
             activity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
-
         if (accessFineLocationPermissionState != PackageManager.PERMISSION_GRANTED
             || readPhoneStatePermissionState != PackageManager.PERMISSION_GRANTED
         ) {
-            showLoadError("Not enough permissions")
+            showLoadError(activity.getString(R.string.permissions_error))
             permitButton.visibility = View.VISIBLE
             return
         }
