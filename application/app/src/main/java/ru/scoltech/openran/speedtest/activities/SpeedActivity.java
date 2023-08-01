@@ -192,14 +192,8 @@ public class SpeedActivity extends AppCompatActivity {
                         getString(R.string.default_main_address)
                 ),
                 TASK_DELAY,
-                stageConfigurationParser
-                        .parseFromPreferences(
-                                getSharedPreferences("iperf_args_pipeline", MODE_PRIVATE),
-                                this::getString
-                        )
-                        .stream()
-                        .map(StageConfigurationParser.FromPreferencesStageConfiguration::getStageConfiguration)
-                        .collect(Collectors.toList())
+
+                stageConfigurationParser.getStageFromPrefs(this)
         );
     }
 

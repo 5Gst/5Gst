@@ -75,4 +75,7 @@
     <string name="add_pipeline">Add pipeline</string>
     <string name="pipeline_name">Pipeline name</string>
     <string name="permissions_error">Not enough permissions! We need permissions to access your location and to make and manage phone calls</string>
+    <string name="pipeline_shared_storage_name">pipeline_shared_storage</string>
+    <string name="stage_field_name">data</string>
+    <string name="show_suggestions">Show suggestions</string>
 </resources>
