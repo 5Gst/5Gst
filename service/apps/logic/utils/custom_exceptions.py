@@ -13,5 +13,5 @@ class ClientError(APIException):
 
 
 class BadRequest(ClientError):
-    def __init__(self, detail='Bad Request 400 error'):
+    def __init__(self, detail='Bad Request 400'):
         super().__init__(detail, status.HTTP_400_BAD_REQUEST)
