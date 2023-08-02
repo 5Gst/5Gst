@@ -1,7 +1,3 @@
-# Custom exception
-import sys
-import types
-
 from rest_framework.exceptions import APIException
 from rest_framework import status
 
@@ -17,5 +13,5 @@ class ClientError(APIException):
 
 
 class BadRequest(ClientError):
-    def __init__(self, detail):
+    def __init__(self, detail='Bad Request 400 error'):
         super().__init__(detail, status.HTTP_400_BAD_REQUEST)
