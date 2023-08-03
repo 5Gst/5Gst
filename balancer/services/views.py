@@ -143,8 +143,8 @@ class ServiceAcquirementView(APIView):
             if not acquired_address:
                 return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-            was_acquired = models.FiveGstToken.objects\
-                .filter(token=request.user.token.token, acquired_service__isnull=True)\
+            was_acquired = models.FiveGstToken.objects \
+                .filter(token=request.user.token.token, acquired_service__isnull=True) \
                 .update(acquired_service=acquired_address)
             if not was_acquired:
                 return Response('Could not acquire service due to a conflict, try again',
