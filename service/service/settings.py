@@ -24,7 +24,6 @@ load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, 'subdir').
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -59,11 +58,9 @@ MIDDLEWARE = [
     'middleware.logger.FiveGstLoggerMiddleware'
 ]
 
-
 ROOT_URLCONF = 'service.urls'
 
 WSGI_APPLICATION = 'service.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -131,6 +128,7 @@ class SpeedtestSwaggerAutoSchema(SwaggerAutoSchema):
 
         return tags
 
+
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': openapi.Info(
         title="Service API",
@@ -165,6 +163,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SERVICE_IP_ADDRESS = os.getenv('SERVICE_IP_ADDRESS')
 BALANCER_ADDRESS = os.getenv('BALANCER_ADDRESS')
+IPERF_LAUNCH_PARAMETERS = os.getenv('IPERF_LAUNCH_PARAMETERS', "-s -u -f b -i 0.1 --sum-only")
 IPERF_PORT = int(os.getenv('IPERF_PORT'))
 SERVICE_PORT = int(os.getenv('SERVICE_PORT'))
 WATCHDOG_STOP_TIMEOUT_SECONDS = float(os.getenv('WATCHDOG_STOP_TIMEOUT_SECONDS', '1.0'))
