@@ -36,3 +36,9 @@ class StopIperfView(APIView):
     @SessionWebService.stop_iperf_swagger_auto_schema
     def post(self, request: Request):
         return session_web_service.stop_iperf()
+
+
+class IperfSpeedResultsView(APIView):
+    @SessionWebService.get_iperf_speed_results_swagger_auto_schema
+    def get(self, request: Request):
+        return session_web_service.get_iperf_speed_results()
