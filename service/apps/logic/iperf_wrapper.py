@@ -8,13 +8,13 @@ import sys
 from io import TextIOWrapper
 from threading import Thread
 from typing import IO
-
+from service import settings
 logger = logging.getLogger(__name__)
 
 
-class IperfWrapper:
 
-    def __init__(self, parameters: str = "-s -u", verbose: bool = False) -> None:
+class IperfWrapper:
+    def __init__(self, parameters: str = settings.IPERF_LAUNCH_PARAMETERS, verbose: bool = False) -> None:
         self.threads: list = []
         self.iperf_waiting_thread: Thread = None
         self.iperf_process: subprocess.Popen = None

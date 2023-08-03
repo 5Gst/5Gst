@@ -1,10 +1,10 @@
 import logging
-
 from rest_framework.request import Request
+from django.http import HttpResponse
 from rest_framework.views import APIView
-
-from apps import serializers
+from drf_yasg.utils import swagger_auto_schema
 from apps.logic.session_web_service import session_web_service, SessionWebService
+from apps import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +12,14 @@ logger = logging.getLogger(__name__)
 class StartSessionView(APIView):
     @SessionWebService.start_session_swagger_auto_schema
     def post(self, request: Request):
+        print("StartSessionView")
         return session_web_service.start_session()
 
 
 class StopSessionView(APIView):
     @SessionWebService.stop_session_swagger_auto_schema
     def post(self, request: Request):
+        print("StopSessionView")
         return session_web_service.stop_session()
 
 
@@ -36,3 +38,14 @@ class StopIperfView(APIView):
     @SessionWebService.stop_iperf_swagger_auto_schema
     def post(self, request: Request):
         return session_web_service.stop_iperf()
+
+
+class IperfSpeedResultsAPIView(APIView):
+    @swagger_auto_schema(
+        operation_description='Client requests server for speeed results',
+        operation_id='send_results',
+        request_body=serializers.IperfSpeedResultsSerializer,
+        security=[],
+    )
+    def get(self, request: Request):
+        return HttpResponse(status=200)
