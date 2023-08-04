@@ -73,7 +73,8 @@ class SessionWebService:
         iperf.iperf_parameters = iperf_args
         if iperf.start(port_iperf=settings.IPERF_PORT):
             iperf_stop_watchdog_service.start()
-            logger.info(f"iPerf started with parameters {iperf.iperf_parameters}")
+            logger.info(f"iPerf parameters received from client: {iperf.iperf_parameters}")
+            # Seems sensitive to app. Changes kills session pipeline.
             return Response(data=f"iPerf started with parameters {iperf.iperf_parameters}",
                             status=status.HTTP_200_OK)
         else:

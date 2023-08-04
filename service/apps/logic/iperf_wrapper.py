@@ -5,16 +5,18 @@ import os
 import shlex
 import subprocess
 import sys
+from service import settings
+from apps.logic import iperf_parser_container
 from io import TextIOWrapper
 from threading import Thread
 from typing import IO
-from service import settings
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+iperf_active_parsed_speed_container = None
 
 
 class IperfWrapper:
-    def __init__(self, parameters: str = settings.IPERF_LAUNCH_PARAMETERS, verbose: bool = False) -> None:
+    def __init__(self, parameters: str = "-s -u", verbose: bool = False) -> None:
         self.threads: list = []
         self.iperf_waiting_thread: Thread = None
         self.iperf_process: subprocess.Popen = None
@@ -27,9 +29,13 @@ class IperfWrapper:
             cmd, stdout=sys.stdout, stderr=sys.stderr, universal_newlines=True)
         iperf_version_process.wait()
 
-    def __logger_thread(self, stream: IO, file: TextIOWrapper):
-        def handle_logs(stream: IO, file: TextIOWrapper):
+    def __stdout_processor_thread(self, stream: IO, file: TextIOWrapper):
+        def process(stream: IO, file: TextIOWrapper):
+            global iperf_active_parsed_speed_container
+            iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadSpeedResultsContainer()
             for stdout_line in iter(stream.readline, ""):
+                if iperf_active_parsed_speed_container:
+                    iperf_active_parsed_speed_container.append_line(str(stdout_line))
                 file.writelines(stdout_line)
                 file.flush()
                 if self.verbose:
@@ -37,7 +43,7 @@ class IperfWrapper:
             stream.close()
             file.close()
 
-        t = Thread(target=handle_logs, args=(stream, file))
+        t = Thread(target=process, args=(stream, file))
         t.daemon = True
         t.start()
         return t
@@ -67,10 +73,15 @@ class IperfWrapper:
         logger.info(f"iPerf stopped with status {return_code}")
 
     def start(self, port_iperf):
+        extra_iperf_parameters = ''
         if not self.is_started:
             output_file, error_file = self.__create_logs_stream()
+            # Check if we're having UDP download session
+            if self.iperf_parameters.count('-u'):
+                extra_iperf_parameters = settings.IPERF_UDP_DOWNLOAD_PARAMETERS
+            cmd = shlex.split(
+                "./iperf.elf " + '-p ' + str(port_iperf) + ' ' + self.iperf_parameters + ' ' + extra_iperf_parameters)
 
-            cmd = shlex.split("./iperf.elf " + '-p ' + str(port_iperf) + ' ' + self.iperf_parameters)
             self.iperf_process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             logger.info(f"iPerf is started using command {cmd}")
@@ -81,11 +92,11 @@ class IperfWrapper:
 
             self.threads = []
             if self.iperf_process.stdout is not None:
-                self.threads.append(self.__logger_thread(
+                self.threads.append(self.__stdout_processor_thread(
                     self.iperf_process.stdout, output_file))
 
             if self.iperf_process.stderr is not None:
-                self.threads.append(self.__logger_thread(
+                self.threads.append(self.__stdout_processor_thread(
                     self.iperf_process.stderr, error_file))
 
             return True
@@ -93,9 +104,10 @@ class IperfWrapper:
             return False
 
     def stop(self):
+        global iperf_active_parsed_speed_container
         if self.iperf_process is None:
             return 0
-
+        iperf_active_parsed_speed_container = None
         self.iperf_process.terminate()
         self.iperf_waiting_thread.join()
         return_code = self.iperf_process.poll()
