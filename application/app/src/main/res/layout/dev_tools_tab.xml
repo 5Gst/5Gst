@@ -132,7 +132,7 @@
                 android:id="@+id/icmpPingButton"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#0f62fe"
+                android:backgroundTint="@color/button_color"
                 android:text="@string/icmpPing"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/serverIP"
@@ -185,7 +185,7 @@
                 android:id="@+id/dev_tools_iperf_start_button"
                 android:layout_width="140sp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#0f62fe"
+                android:backgroundTint="@color/button_color"
                 android:text="@string/startIperf"
                 />
         </LinearLayout>
@@ -200,7 +200,7 @@
                 android:id="@+id/dev_tools_iperf_clear_button"
                 android:layout_width="140sp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#0f62fe"
+                android:backgroundTint="@color/button_color"
                 android:text="@string/clearLogs"
                 />
         </LinearLayout>
