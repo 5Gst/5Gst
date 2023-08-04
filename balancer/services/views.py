@@ -4,19 +4,23 @@ import secrets
 
 from django.conf import settings
 from django.db import transaction, IntegrityError
+from django.http import HttpResponseBadRequest
 from django.utils.timezone import make_aware
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
+from rest_framework.serializers import ValidationError
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.request import Request
 
 import service_api.rest
 from services import serializers, models
 from services.authentication import FiveGstAuthentication
 from services.models import FiveGstToken
+from services.utils.iperf_stats_api import IperfStatsAPI
 
 logger = logging.getLogger(__name__)
 
@@ -166,4 +170,19 @@ class PingView(APIView):
         security=[],
     )
     def get(self, request):
+        return Response(status=status.HTTP_200_OK)
+
+
+class IperfUserStats(APIView):
+    def get(self, request: Request):
+        id = request.query_params.get('id', None)
+        if id is None:
+            raise HttpResponseBadRequest
+
+        serialized_data = IperfStatsAPI().read(id=id)
+        return Response(serialized_data, status=status.HTTP_200_OK)
+
+    def post(self, request: Request):
+        data = request.data['iperf_stats']
+        IperfStatsAPI().create(data)
         return Response(status=status.HTTP_200_OK)

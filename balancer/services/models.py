@@ -56,4 +56,5 @@ class FiveGstToken(models.Model):
 
 class IperfStatistics(models.Model):
     results = models.JSONField()
+    start_timestamp = models.DateTimeField()
 
