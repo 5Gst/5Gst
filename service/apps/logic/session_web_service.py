@@ -1,5 +1,6 @@
 import logging
 
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -96,6 +97,25 @@ class SessionWebService:
         self._stop_watchdog_service.reset_timer()
         iperf_stop_watchdog_service.stop()
         return Response("Iperf was successfully stopped", status=status.HTTP_200_OK)
+
+    get_iperf_speed_results_swagger_auto_schema = swagger_auto_schema(
+        operation_description='Returns iperf speed results',
+        operation_id='iperf_speed_results',
+        manual_parameters=[
+            openapi.Parameter(
+                'from_frame',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={
+            200: openapi.Response('Speed results are successfully returned', serializers.IperfSpeedResultsSerializer),
+        },
+    )
+
+    def get_iperf_speed_results(self) -> Response:
+        serializer = serializers.IperfSpeedResultsSerializer(instance={'results': [1, 2, 3]})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 session_web_service = SessionWebService()

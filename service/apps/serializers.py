@@ -7,3 +7,4 @@ class IperfArgsSerializer(serializers.Serializer):
 
 class IperfSpeedResultsSerializer(serializers.Serializer):
     probes = serializers.ListField(child=serializers.IntegerField())
+

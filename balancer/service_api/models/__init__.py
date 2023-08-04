@@ -16,3 +16,4 @@ from __future__ import absolute_import
 
 # import models into model package
 from service_api.models.iperf_args import IperfArgs
+from service_api.models.iperf_speed_results import IperfSpeedResults
