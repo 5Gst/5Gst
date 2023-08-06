@@ -101,27 +101,28 @@ jobs:
         working-directory: ./service
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-          # Work-around, see https://github.com/actions/checkout/issues/439
-          ref: ${{ github.ref }}
-
-      - name: Clear previously generated code
-        run: |
-          rm -rf ../AUTOBUILD-service
-          rm -rf ../application/serviceApi
-          rm -rf ../balancer/service_api
       - name: Download generated code
         uses: actions/download-artifact@v2
         with:
           name: AUTOBUILD-service
           path: AUTOBUILD-service
 
+      - name: Move downloaded files to /tmp directory
+        working-directory: .
+        run: |
+          mv AUTOBUILD-service /tmp
+
+      # Late checkout so git push race happens less likely
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+
       - name: Move generated code to projects
         run: |
-          cp -r ../AUTOBUILD-service/application2ServiceClient/ ../application/serviceApi
-          cp -r ../AUTOBUILD-service/balancer2ServiceClient/service_api/ ../balancer/service_api
+          cp -r /tmp/AUTOBUILD-service/application2ServiceClient/ ../application/serviceApi
+          cp -r /tmp/AUTOBUILD-service/balancer2ServiceClient/service_api/ ../balancer/service_api
           cd ../application
           git apply ./.swagger-codegen-config/serviceApi.patch
 

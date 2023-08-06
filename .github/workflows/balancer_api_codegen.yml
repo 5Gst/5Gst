@@ -97,27 +97,28 @@ jobs:
         working-directory: ./balancer
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-          # Work-around, see https://github.com/actions/checkout/issues/439
-          ref: ${{ github.ref }}
-
-      - name: Clear previously generated code
-        run: |
-          rm -rf ../AUTOBUILD-balancer
-          rm -rf ../application/balancerApi
-          rm -rf ../service/balancer_api
       - name: Download generated code
         uses: actions/download-artifact@v2
         with:
           name: AUTOBUILD-balancer
           path: AUTOBUILD-balancer
 
+      - name: Move downloaded files to /tmp directory
+        working-directory: .
+        run: |
+          mv AUTOBUILD-balancer /tmp
+
+      # Late checkout so git push race happens less likely
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+
       - name: Move generated code to projects
         run: |
-          cp -r ../AUTOBUILD-balancer/application2BalancerClient/ ../application/balancerApi
-          cp -r ../AUTOBUILD-balancer/service2BalancerClient/balancer_api/ ../service/balancer_api
+          cp -r /tmp/AUTOBUILD-balancer/application2BalancerClient/ ../application/balancerApi
+          cp -r /tmp/AUTOBUILD-balancer/service2BalancerClient/balancer_api/ ../service/balancer_api
           cd ../application
           git apply ./.swagger-codegen-config/balancerApi.patch
 
