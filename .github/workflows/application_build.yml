@@ -2,6 +2,21 @@ name: "Build Android artifacts"
 
 on:
   workflow_call:
+    secrets:
+      FIVE_GST_BOT_ACCESS_TOKEN:
+        required: true
+
+      RELEASE_KEYSTORE_GIT_REPOSITORY:
+        required: true
+
+      RELEASE_KEYSTORE_PASSWORD:
+        required: true
+
+      RELEASE_SIGN_KEY_ALIAS:
+        required: true
+
+      RELEASE_SIGN_KEY_PASSWORD:
+        required: true
 
 jobs:
   debug-build:
