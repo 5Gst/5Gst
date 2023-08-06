@@ -2,6 +2,12 @@ name: "Publish balancer docker image to Docker Hub"
 
 on:
   workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+
+      DOCKER_ACCESS_TOKEN:
+        required: true
 
 jobs:
   publish-to-dockerhub:
