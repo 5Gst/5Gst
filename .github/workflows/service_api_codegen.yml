@@ -121,6 +121,8 @@ jobs:
 
       - name: Move generated code to projects
         run: |
+          rm -rf ../application/serviceApi
+          rm -rf ../balancer/service_api
           cp -r /tmp/AUTOBUILD-service/application2ServiceClient/ ../application/serviceApi
           cp -r /tmp/AUTOBUILD-service/balancer2ServiceClient/service_api/ ../balancer/service_api
           cd ../application
