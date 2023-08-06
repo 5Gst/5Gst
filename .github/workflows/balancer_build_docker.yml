@@ -13,13 +13,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-
-      # Work-around, see https://github.com/actions/checkout/issues/439
-      - name: Update git repository
-        run: |
-          git submodule init
-          git submodule update
-          git pull origin $(git rev-parse --abbrev-ref HEAD)
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
 
       - name: Setup version variable
         run: |
