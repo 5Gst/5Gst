@@ -17,7 +17,7 @@ jobs:
 
       # Work-around, see https://github.com/actions/checkout/issues/439
       - name: Update git repository
-        run: git pull --ff-only
+        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       # Work-around, see https://github.com/android-actions/setup-android/issues/378
       - name: Set up JDK 11
@@ -86,7 +86,7 @@ jobs:
 
       # Work-around, see https://github.com/actions/checkout/issues/439
       - name: Update git repository
-        run: git pull --ff-only
+        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       # Work-around, see https://github.com/android-actions/setup-android/issues/378
       - name: Set up JDK 11
