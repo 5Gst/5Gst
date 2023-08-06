@@ -21,4 +21,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="top_bar">#061A81</color>
+    <color name="button_color">#0f62fe</color>
 </resources>
