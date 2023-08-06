@@ -1,17 +1,17 @@
-name: artifact
+name: "Collect self-host artifacts"
 
-on: 
+on:
   workflow_call:
-  
+
 jobs:
- make_artifacts:
+  build-artifacts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup version variable  
+      - name: Setup version variable
         run: |
           echo "version=$(cat ./VERSION)" > $GITHUB_ENV
-      - name: install images and convert to .tar
+      - name: Install docker images and convert to .tar
         run: |
           docker pull 5gst/speedtest-service:latest
           docker pull 5gst/speedtest-balancer:latest
@@ -20,7 +20,7 @@ jobs:
           docker save 5gst/speedtest-balancer:latest | gzip > balancer.tar.gz
           docker save postgres:${POSTGRES_VERSION:-14.4} | gzip > postgres.tar.gz
 
-      - name: upload artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: 5gst-selfhost

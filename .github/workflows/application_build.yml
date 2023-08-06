@@ -1,6 +1,6 @@
-name: "APPLICATION_Build_Android_artifacts"
+name: "Build Android artifacts"
 
-on: 
+on:
   workflow_call:
 
 jobs:

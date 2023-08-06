@@ -1,30 +1,44 @@
-name: main_workflow
+name: "5Gst CI"
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
-  application-build:
-    name: run application_build workflow
-    uses: ./.github/workflows/application_build.yml
-    
   balancer-api-codegen:
-    name: run balancer_api_codegen workflow
+    name: "[Balancer] Generate balancer API client using Swagger codegen"
     uses: ./.github/workflows/balancer_api_codegen.yml
-  balancer-build-docker:
-    needs: balancer-api-codegen
-    name: run balancer_build_docker workflow
-    uses: ./.github/workflows/balancer_build_docker.yaml
-    
-    
   service-api-codegen:
-    name: run service_api_codegen workflow
+    name: "[Service] Generate service API client using Swagger codegen"
+    needs: [ balancer-api-codegen ] # preventing parallel git push
     uses: ./.github/workflows/service_api_codegen.yml
+  balancer-make-migrations:
+    name: "[Balancer] Generate balancer migration scripts"
+    needs: [ service-api-codegen ] # preventing parallel git push
+    uses: ./.github/workflows/balancer_make_migrations.yml
+
+  balancer-build-docker:
+    name: "[Balancer] Publish balancer docker image to Docker Hub"
+    needs: [ service-api-codegen, balancer-make-migrations ]
+    uses: ./.github/workflows/balancer_build_docker.yml
+  balancer-tests:
+    name: "[Balancer] Run Balancer Tests"
+    needs: [ service-api-codegen, balancer-make-migrations ]
+    uses: ./.github/workflows/balancer_tests.yml
+
+  service-tests:
+    name: "[Service] Run Service Tests"
+    needs: [ balancer-api-codegen ]
+    uses: ./.github/workflows/service_tests.yml
   service-build-docker:
-    needs: service-api-codegen
-    name: run service_build_docker workflow
+    name: "[Service] Publish service docker image to Docker Hub"
+    needs: [ balancer-api-codegen ]
     uses: ./.github/workflows/service_build_docker.yml
-    
-  make-artifacts:
-    needs: [service-build-docker,balancer-build-docker]
-    name: run make_artifacts workflow
-    uses: ./.github/workflows/make_artifacts.yml
+
+  application-build:
+    name: "[Application] Build Android artifacts"
+    needs: [ service-api-codegen, balancer-api-codegen ]
+    uses: ./.github/workflows/application_build.yml
+
+  collect-selfhost-artifacts:
+    name: "Collect self-host artifacts"
+    needs: [ service-build-docker, balancer-build-docker ]
+    uses: ./.github/workflows/main_collect_selfhost_artifacts.yml
