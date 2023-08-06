@@ -23,7 +23,10 @@ jobs:
 
       # Work-around, see https://github.com/actions/checkout/issues/439
       - name: Update git repository
-        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
+        run: |
+          git submodule init
+          git submodule update
+          git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v3
@@ -38,7 +41,10 @@ jobs:
 
       # Now git push race is less likely to happen
       - name: Update git repository
-        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
+        run: |
+          git submodule init
+          git submodule update
+          git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Push changes to git
         uses: stefanzweifel/git-auto-commit-action@v4

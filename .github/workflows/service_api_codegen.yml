@@ -23,7 +23,10 @@ jobs:
 
       # Work-around, see https://github.com/actions/checkout/issues/439
       - name: Update git repository
-        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
+        run: |
+          git submodule init
+          git submodule update
+          git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       # TODO fix service so it can generate swagger schema without iperf built
       - name: iPerf compilation
@@ -109,7 +112,10 @@ jobs:
 
       # Work-around, see https://github.com/actions/checkout/issues/439
       - name: Update git repository
-        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
+        run: |
+          git submodule init
+          git submodule update
+          git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Clear previously generated code
         run: |
@@ -131,7 +137,10 @@ jobs:
 
       # Now git push race is less likely to happen
       - name: Update git repository
-        run: git pull origin $(git rev-parse --abbrev-ref HEAD)
+        run: |
+          git submodule init
+          git submodule update
+          git pull origin $(git rev-parse --abbrev-ref HEAD)
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
