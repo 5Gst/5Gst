@@ -1,0 +1,41 @@
+name: "Generate balancer migration scripts"
+
+on:
+  workflow_call:
+
+jobs:
+  balancer-make-migrations:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test
+      DB_NAME: test
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_HOST: test
+      DB_PORT: test
+    defaults:
+      run:
+        working-directory: ./balancer
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Make migrations
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install
+          pipenv run python manage.py makemigrations
+
+      - name: Push changes to git
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Generate balancer migration scripts"
+          file_pattern: balancer/services/migrations
