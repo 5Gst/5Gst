@@ -19,7 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: recursive
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       # TODO fix service so it can generate swagger schema without iperf built
       - name: iPerf compilation
@@ -53,6 +57,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       - name: Download swagger schema
         uses: actions/download-artifact@v2
@@ -100,6 +110,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       - name: Clear previously generated code
         run: |
@@ -118,6 +134,11 @@ jobs:
           cp -r ../AUTOBUILD-service/balancer2ServiceClient/service_api/ ../balancer/service_api
           cd ../application
           git apply ./.swagger-codegen-config/serviceApi.patch
+
+      # Now git push race is less likely to happen
+      - name: Update git repository
+        run: git pull --ff-only
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
             commit_message: 'Generate service client using swagger-codegen'

@@ -13,9 +13,14 @@ jobs:
       run:
         working-directory: ./balancer
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          submodules: recursive
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v3
         with:

@@ -11,9 +11,13 @@ jobs:
         working-directory: ./application
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       # Work-around, see https://github.com/android-actions/setup-android/issues/378
       - name: Set up JDK 11
@@ -76,9 +80,13 @@ jobs:
         working-directory: ./application
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       # Work-around, see https://github.com/android-actions/setup-android/issues/378
       - name: Set up JDK 11
@@ -121,7 +129,7 @@ jobs:
           variableFileName: 'variables'
 
       - name: Get signing key
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           token: ${{ secrets.FIVE_GST_BOT_ACCESS_TOKEN }}

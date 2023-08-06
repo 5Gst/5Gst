@@ -8,11 +8,9 @@ jobs:
     uses: ./.github/workflows/balancer_api_codegen.yml
   service-api-codegen:
     name: "[Service] Generate service API client using Swagger codegen"
-    needs: [ balancer-api-codegen ] # preventing parallel git push
     uses: ./.github/workflows/service_api_codegen.yml
   balancer-make-migrations:
     name: "[Balancer] Generate balancer migration scripts"
-    needs: [ service-api-codegen ] # preventing parallel git push
     uses: ./.github/workflows/balancer_make_migrations.yml
 
   balancer-build-docker:

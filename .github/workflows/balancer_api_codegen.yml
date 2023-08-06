@@ -19,6 +19,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v3
@@ -48,6 +54,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       - name: Download swagger schema
         uses: actions/download-artifact@v2
@@ -95,6 +107,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      # Work-around, see https://github.com/actions/checkout/issues/439
+      - name: Update git repository
+        run: git pull --ff-only
 
       - name: Clear previously generated code
         run: |
@@ -113,6 +131,11 @@ jobs:
           cp -r ../AUTOBUILD-balancer/service2BalancerClient/balancer_api/ ../service/balancer_api
           cd ../application
           git apply ./.swagger-codegen-config/balancerApi.patch
+
+      # Now git push race is less likely to happen
+      - name: Update git repository
+        run: git pull --ff-only
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Generate balancer client using swagger-codegen'
