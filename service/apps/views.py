@@ -40,6 +40,7 @@ class StopIperfView(APIView):
         return session_web_service.stop_iperf()
 
 
+
 class IperfSpeedResultsAPIView(APIView):
     @swagger_auto_schema(
         operation_description='Client requests server for real speed results',
