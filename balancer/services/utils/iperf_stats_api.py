@@ -1,5 +1,6 @@
 import logging
 
+from django.http import HttpResponseBadRequest
 from rest_framework.serializers import ValidationError
 from rest_framework.utils.serializer_helpers import ReturnDict
 
@@ -9,7 +10,7 @@ from services.serializers import IperfStatisticsSerializer
 logger = logging.getLogger(__name__)
 
 
-class IperfStatsAPI:
+class IperfMeasurementHistoryAPI:
     def create(self, json_data: dict[str: list[dict[str: float], ...]]) -> None:
         json_data['start_timestamp'] = json_data['results'][0]['timestamp']
         try:
@@ -19,6 +20,7 @@ class IperfStatsAPI:
             logger.info('Saved user iperf results in database.')
         except ValidationError as exc:
             logger.error(f"Error {exc.status_code} happened: {exc.detail}", exc_info=exc)
+            raise HttpResponseBadRequest
 
     def read(self, id: int) -> ReturnDict:
         instance = IperfStatistics.objects.get(id=id)

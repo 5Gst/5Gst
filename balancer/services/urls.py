@@ -7,6 +7,6 @@ urlpatterns = [
     path('logout/', views.FiveGstLogoutView.as_view(), name='five-gst-logout'),
     path('service/', views.ServiceRegistrationView.as_view(), name='service-registration'),
     path('service/acquire/', views.ServiceAcquirementView.as_view(), name='service-acquirement'),
-    path('service/stats/', views.IperfUserStats.as_view()),
+    path('service/stats/', views.IperfMeasurementHistoryView.as_view()),
     path('ping/', views.PingView.as_view()),
 ]
