@@ -14,6 +14,7 @@
 package ru.scoltech.openran.speedtest.client.service.api;
 
 import ru.scoltech.openran.speedtest.client.service.model.IperfArgs;
+import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedResults;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -31,6 +32,22 @@ public class ServiceApiTest {
 
     private final ServiceApi api = new ServiceApi();
 
+    
+    /**
+     * 
+     *
+     * Returns iperf speed results
+     *
+     * @throws Exception
+     *          if the Api call fails
+     */
+    @Test
+    public void iperfSpeedResultsTest() throws Exception {
+        String fromFrame = null;
+        IperfSpeedResults response = api.iperfSpeedResults(fromFrame);
+
+        // TODO: test validations
+    }
     
     /**
      * 

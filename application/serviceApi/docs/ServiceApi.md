@@ -4,11 +4,57 @@ All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**iperfSpeedResults**](ServiceApi.md#iperfSpeedResults) | **GET** /api/v1/measurement/results | 
 [**startIperf**](ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start | 
 [**startSession**](ServiceApi.md#startSession) | **POST** /api/v1/session/start | 
 [**stopIperf**](ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop | 
 [**stopSession**](ServiceApi.md#stopSession) | **POST** /api/v1/session/stop | 
 
+
+<a name="iperfSpeedResults"></a>
+# **iperfSpeedResults**
+> IperfSpeedResults iperfSpeedResults(fromFrame)
+
+
+
+Returns iperf speed results
+
+### Example
+```java
+// Import classes:
+//import ru.scoltech.openran.speedtest.client.service.ApiException;
+//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+
+
+ServiceApi apiInstance = new ServiceApi();
+String fromFrame = "fromFrame_example"; // String | 
+try {
+    IperfSpeedResults result = apiInstance.iperfSpeedResults(fromFrame);
+    System.out.println(result);
+} catch (ApiException e) {
+    System.err.println("Exception when calling ServiceApi#iperfSpeedResults");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **fromFrame** | **String**|  | [optional]
+
+### Return type
+
+[**IperfSpeedResults**](IperfSpeedResults.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
 
 <a name="startIperf"></a>
 # **startIperf**
