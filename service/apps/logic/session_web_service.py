@@ -1,11 +1,14 @@
 import logging
 
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.request import Request
+from django.core.exceptions import BadRequest
 
 from apps import serializers
-from apps.logic.iperf_wrapper import iperf
+from apps.logic import iperf_wrapper
 from apps.logic.watchdog import WatchdogService
 from apps.logic.watchdog_service import balancer_communication_watchdog_service, iperf_stop_watchdog_service
 from service import settings
@@ -70,12 +73,12 @@ class SessionWebService:
         self._stop_watchdog_service.reset_timer()
 
         self.stop_iperf()
-        iperf.iperf_parameters = iperf_args
-        if iperf.start(port_iperf=settings.IPERF_PORT):
+        iperf_wrapper.iperf.iperf_parameters = iperf_args
+        if iperf_wrapper.iperf.start(port_iperf=settings.IPERF_PORT):
             iperf_stop_watchdog_service.start()
-            logger.info(f"iPerf parameters received from client: {iperf.iperf_parameters}")
+            logger.info(f"iPerf parameters received from client: {iperf_wrapper.iperf.iperf_parameters}")
             # Seems sensitive to app. Changes kills session pipeline.
-            return Response(data=f"iPerf started with parameters {iperf.iperf_parameters}",
+            return Response(data=f"iPerf parameters received from client: {iperf_wrapper.iperf.iperf_parameters}",
                             status=status.HTTP_200_OK)
         else:
             logger.error("Failed to start iperf")
@@ -89,13 +92,38 @@ class SessionWebService:
         if not self._is_in_session:
             return Response("Not in session", status=status.HTTP_400_BAD_REQUEST)
 
-        status_code = iperf.stop()
+        status_code = iperf_wrapper.iperf.stop()
         if status_code != 0:
             logger.error(f"Iperf was stopped with status code {status_code}")
 
         self._stop_watchdog_service.reset_timer()
         iperf_stop_watchdog_service.stop()
         return Response("Iperf was successfully stopped", status=status.HTTP_200_OK)
+
+    get_iperf_speed_results_swagger_auto_schema = swagger_auto_schema(
+        operation_description='Returns iperf speed probes',
+        operation_id='iperf_speed_probes',
+        manual_parameters=[
+            openapi.Parameter(
+                'from_frame',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={
+            200: openapi.Response('Speed results are successfully returned', serializers.IperfSpeedProbesSerializer),
+
+        },
+    )
+
+    def get_iperf_speed_results(self, request: Request):
+        start_index = request.GET.get('from_frame')
+        if iperf_wrapper.iperf.iperf_active_parsed_speed_container is None or start_index is None:
+            raise BadRequest()
+        model = iperf_wrapper.iperf.iperf_active_parsed_speed_container.get_from_probe(int(start_index))
+        serialized_model = serializers.IperfSpeedProbesSerializer(model)
+
+        return Response(data=serialized_model.data, status=status.HTTP_200_OK)
 
 
 session_web_service = SessionWebService()
