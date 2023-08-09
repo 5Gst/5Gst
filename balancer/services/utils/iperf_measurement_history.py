@@ -21,7 +21,7 @@ class IperfMeasurementHistoryAPI:
         }
     )
 
-    def create(self, data: dict[str: list[dict[str: float], ...]]) -> Response:
+    def create(self, data) -> Response:
         try:
             serializer_for_writing = IperfStatisticsSerializer(data=data)
             serializer_for_writing.is_valid(raise_exception=True)
@@ -40,7 +40,7 @@ class IperfMeasurementHistoryAPI:
         }
     )
 
-    def read(self, id: int) -> Response:
+    def read(self, id) -> Response:
         if id is None:
             logger.error('User ID not received to get data.')
             raise HttpResponseBadRequest
