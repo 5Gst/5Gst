@@ -52,6 +52,21 @@ public class BalancerApiTest {
     /**
      * 
      *
+     * 
+     *
+     * @throws Exception
+     *          if the Api call fails
+     */
+    @Test
+    public void createTest() throws Exception {
+        api.create();
+
+        // TODO: test validations
+    }
+    
+    /**
+     * 
+     *
      * Log in to 5Gst service
      *
      * @throws Exception
@@ -90,6 +105,21 @@ public class BalancerApiTest {
     @Test
     public void pingTest() throws Exception {
         api.ping();
+
+        // TODO: test validations
+    }
+    
+    /**
+     * 
+     *
+     * 
+     *
+     * @throws Exception
+     *          if the Api call fails
+     */
+    @Test
+    public void readTest() throws Exception {
+        api.read();
 
         // TODO: test validations
     }
