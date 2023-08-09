@@ -115,6 +115,7 @@ private constructor(
             )
             val stopServiceIperfTask = StopServiceIperfTask()
 
+
             val startIperfTask = StartIperfTask(
                 context.filesDir.absolutePath,
                 "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
@@ -126,21 +127,54 @@ private constructor(
                 DEFAULT_TIMEOUT.toLong(),
                 onStageSpeedUpdate,
                 { onStageFinish(stageConfiguration, it) },
-                onLog
+                onLog,
             )
-
-            mutableTaskConsumer = mutableTaskConsumer
-                .withArgumentExtracted { it.iperfAddress }
-                .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
-                .andThenTry {
-                    initializeNewChain()
-                        .andThen(startServiceIperfTask)
-                        .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
-                        .withArgumentExtracted { it.iperfAddress }
-                        .doTask(startIperfTask)
-                }
-                .andThenFinally(stopServiceIperfTask)
-                .andThen(DelayTask(idleBetweenTasksMelees))
+            val startUdpUploadIperfTask = StartUdpUploadIperfTask(
+                context.filesDir.absolutePath,
+                "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+                MultithreadedIperfOutputParser(),
+                SkipThenAverageEqualizer(
+                    DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                    DEFAULT_EQUALIZER_MAX_STORING
+                ),
+                DEFAULT_TIMEOUT.toLong(),
+                onStageSpeedUpdate,
+                onLog,
+            )
+            val args = stageConfiguration.deviceArgs + stageConfiguration.serverArgs
+            if ( args.contains("-u") && !args.contains("-R")) {
+                mutableTaskConsumer = mutableTaskConsumer
+                    .withArgumentExtracted { it.iperfAddress }
+                    .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+                    .andThenTry {
+                        initializeNewChain()
+                            .andThen(startServiceIperfTask)
+                            .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                            .withArgumentExtracted { it }
+                            .doTask(startUdpUploadIperfTask)
+                    }
+                    .andThenFinally(stopServiceIperfTask)
+                    .andThen(
+                        GetMeasurementResultsTask(
+                            startUdpUploadIperfTask.getStatistics(),
+                            { onStageFinish(stageConfiguration, it) },
+                        )
+                    )
+                    .andThen(DelayTask(idleBetweenTasksMelees))
+            } else {
+                mutableTaskConsumer = mutableTaskConsumer
+                    .withArgumentExtracted { it.iperfAddress }
+                    .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+                    .andThenTry {
+                        initializeNewChain()
+                            .andThen(startServiceIperfTask)
+                            .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                            .withArgumentExtracted { it.iperfAddress }
+                            .doTask(startIperfTask)
+                    }
+                    .andThenFinally(stopServiceIperfTask)
+                    .andThen(DelayTask(idleBetweenTasksMelees))
+            }
         }
         return mutableTaskConsumer
     }
@@ -171,7 +205,7 @@ private constructor(
                     DEFAULT_TIMEOUT.toLong(),
                     onStageSpeedUpdate,
                     { onStageFinish(stageConfiguration, it) },
-                    onLog
+                    onLog,
                 )
             )
         return chainBuilder.finishChainCreation(taskConsumer) {
