@@ -1,7 +1,7 @@
 name: "Grouped CI of balancer, service and applications"
 
 on: [push, pull_request]
-# Just comment.
+
 jobs:
 
 
