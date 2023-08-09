@@ -84,11 +84,12 @@ public class ServiceApiExample {
     public static void main(String[] args) {
         
         ServiceApi apiInstance = new ServiceApi();
-        IperfArgs data = new IperfArgs(); // IperfArgs | 
+        String fromFrame = "fromFrame_example"; // String | 
         try {
-            apiInstance.startIperf(data);
+            IperfSpeedResults result = apiInstance.iperfSpeedResults(fromFrame);
+            System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ServiceApi#startIperf");
+            System.err.println("Exception when calling ServiceApi#iperfSpeedResults");
             e.printStackTrace();
         }
     }
@@ -102,6 +103,7 @@ All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ServiceApi* | [**iperfSpeedResults**](docs/ServiceApi.md#iperfSpeedResults) | **GET** /api/v1/measurement/results | 
 *ServiceApi* | [**startIperf**](docs/ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start | 
 *ServiceApi* | [**startSession**](docs/ServiceApi.md#startSession) | **POST** /api/v1/session/start | 
 *ServiceApi* | [**stopIperf**](docs/ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop | 
@@ -111,6 +113,7 @@ Class | Method | HTTP request | Description
 ## Documentation for Models
 
  - [IperfArgs](docs/IperfArgs.md)
+ - [IperfSpeedResults](docs/IperfSpeedResults.md)
 
 
 ## Documentation for Authorization

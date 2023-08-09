@@ -1,0 +1,130 @@
+name: "Generate balancer API client using Swagger codegen"
+
+on:
+  workflow_call:
+
+jobs:
+  generate-swagger-schema:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test
+      DB_NAME: test
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_HOST: test
+      DB_PORT: test
+    defaults:
+      run:
+        working-directory: ./balancer
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install pip, pipenv and packages from Pipfile
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install
+      - name: Generate swagger schema
+        run: |
+          pipenv run python manage.py generate_swagger swagger-balancer.yaml
+      - name: Upload swagger schema to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: swagger-schema-balancer
+          path: balancer/swagger-balancer.yaml
+
+  generate-code:
+    runs-on: ubuntu-latest
+    needs: generate-swagger-schema
+    container: swaggerapi/swagger-codegen-cli:2.4.27
+    defaults:
+      run:
+        working-directory: ./balancer
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download swagger schema
+        uses: actions/download-artifact@v2
+        with:
+          name: swagger-schema-balancer
+          path: balancer
+
+      - name: Clear AUTOBUILD directory
+        run: rm -rf ../AUTOBUILD-balancer
+
+      - name: Generate client for service
+        run: >
+          java
+          -jar
+          /opt/swagger-codegen-cli/swagger-codegen-cli.jar
+          generate
+          -i swagger-balancer.yaml
+          -l python
+          -o ../AUTOBUILD-balancer/service2BalancerClient/
+          -c ../service/.swagger-codegen-config/balancerApi.json
+      - name: Generate client for application
+        run: >
+          java
+          -jar
+          /opt/swagger-codegen-cli/swagger-codegen-cli.jar
+          generate
+          -i swagger-balancer.yaml
+          -l java
+          -o ../AUTOBUILD-balancer/application2BalancerClient/
+          -c ../application/.swagger-codegen-config/balancerApi.json
+      # Swagger codegen container has invalid git installed,
+      # so we need another container to push changes
+      - name: Upload generated code to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: AUTOBUILD-balancer
+          path: AUTOBUILD-balancer
+
+  git-push-generated-code:
+    needs: generate-code
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./balancer
+
+    steps:
+      - name: Download generated code
+        uses: actions/download-artifact@v2
+        with:
+          name: AUTOBUILD-balancer
+          path: AUTOBUILD-balancer
+
+      - name: Move downloaded files to /tmp directory
+        working-directory: .
+        run: |
+          mv AUTOBUILD-balancer /tmp
+
+      # Late checkout so git push race happens less likely
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+
+      - name: Move generated code to projects
+        run: |
+          rm -rf ../application/balancerApi
+          rm -rf ../service/balancer_api
+          cp -r /tmp/AUTOBUILD-balancer/application2BalancerClient/ ../application/balancerApi
+          cp -r /tmp/AUTOBUILD-balancer/service2BalancerClient/balancer_api/ ../service/balancer_api
+          cd ../application
+          git apply ./.swagger-codegen-config/balancerApi.patch
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Generate balancer client using swagger-codegen'
+          file_pattern: application/balancerApi service/balancer_api
