@@ -14,12 +14,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.request import Request
+from rest_framework.serializers import ValidationError
 
 import service_api.rest
 from services import serializers, models
 from services.authentication import FiveGstAuthentication
 from services.models import FiveGstToken
-from services.utils.iperf_stats_api import IperfMeasurementHistoryAPI
+from services.utils.iperf_measurement_history import IperfMeasurementHistoryAPI, user_measurement_history
 
 logger = logging.getLogger(__name__)
 
@@ -173,18 +174,23 @@ class PingView(APIView):
 
 
 class IperfMeasurementHistoryView(APIView):
-    user_measurement_history = IperfMeasurementHistoryAPI()
 
-    def get(self, request: Request):
+    @IperfMeasurementHistoryAPI.read_swagger_auto_schema
+    def get(self, request: Request) -> Response:
         id = request.query_params.get('id', None)
-        if id is None:
-            logger.error("User ID not received to get data.")
+        return user_measurement_history.read(id)
+
+    @IperfMeasurementHistoryAPI.create_swagger_auto_schema
+    def post(self, request: Request) -> Response:
+        try:
+            serializer = serializers.IperfStatisticsSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as exc:
+            logger.error(f"Error {exc.status_code} happened: {exc.detail}", exc_info=exc)
             raise HttpResponseBadRequest
 
-        serialized_data = self.user_measurement_history.read(id=id)
-        return Response(serialized_data, status=status.HTTP_200_OK)
-
-    def post(self, request: Request):
-        data = request.data['iperf_stats']
-        self.user_measurement_history.create(data)
-        return Response(status=status.HTTP_201_CREATED)
+        data = {
+            'results': serializer.validated_data['results'],
+            'start_timestamp': serializer.validated_data['start_timestamp'],
+        }
+        return user_measurement_history.create(data)
