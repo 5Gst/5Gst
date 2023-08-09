@@ -8,5 +8,6 @@ urlpatterns = [
         path('session/stop', views.StopSessionView.as_view()),
         path('iperf/start', views.StartIperfView.as_view()),
         path('iperf/stop', views.StopIperfView.as_view()),
+        path('measurement/results', views.IperfSpeedResultsView.as_view()),
     ]))
 ]

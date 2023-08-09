@@ -3,18 +3,24 @@ package ru.scoltech.openran.speedtest.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.telephony.*
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.*
 import ru.scoltech.openran.speedtest.R
@@ -28,6 +34,8 @@ class NetworkInfoTab : Fragment() {
     private lateinit var listenerPermissionRequester: ActivityResultLauncher<Array<String>>
 
     private lateinit var telephonyManager: TelephonyManager
+
+    private lateinit var permitButton: Button
 
     private var networkInfoUpdaterJob: Job? = null
 
@@ -44,6 +52,8 @@ class NetworkInfoTab : Fragment() {
 
         consoleTextView = view.findViewById(R.id.console_layout_text)
         consoleScrollView = view.findViewById(R.id.console_layout_scroll)
+        permitButton = view.findViewById(R.id.permitButton)
+        permitButton.setOnClickListener { requestPermissions() }
 
         listenerPermissionRequester = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
@@ -51,7 +61,7 @@ class NetworkInfoTab : Fragment() {
             if (permissions.values.all { it }) {
                 launchNetworkInfoUpdaterJob()
             } else {
-                showLoadError("Not enough permissions")
+                showLoadError(activity.getString(R.string.permissions_error))
             }
         }
 
@@ -80,16 +90,13 @@ class NetworkInfoTab : Fragment() {
         }
     }
 
-    private fun requestNetworkInfoUpdate() {
-        val activity = requireActivity()
-
-        val accessFineLocationPermissionState =
-            activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-        val readPhoneStatePermissionState =
-            activity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
-
-        if (accessFineLocationPermissionState != PackageManager.PERMISSION_GRANTED
-            || readPhoneStatePermissionState != PackageManager.PERMISSION_GRANTED
+    private fun requestPermissions() {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) ||
+            !ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+            )
         ) {
             listenerPermissionRequester.launch(
                 arrayOf(
@@ -97,12 +104,37 @@ class NetworkInfoTab : Fragment() {
                     Manifest.permission.READ_PHONE_STATE,
                 )
             )
-            runBlocking {
-                networkInfoUpdaterJob?.cancel()
-            }
-            return
+        } else {
+            var settings = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + activity?.packageName)
+            )
+            settings.addCategory(Intent.CATEGORY_DEFAULT)
+            settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(settings)
+
+        }
+        runBlocking {
+            networkInfoUpdaterJob?.cancel()
         }
 
+        return
+    }
+
+    private fun requestNetworkInfoUpdate() {
+        val activity = requireActivity()
+        val accessFineLocationPermissionState =
+            activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        val readPhoneStatePermissionState =
+            activity.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+        if (accessFineLocationPermissionState != PackageManager.PERMISSION_GRANTED
+            || readPhoneStatePermissionState != PackageManager.PERMISSION_GRANTED
+        ) {
+            showLoadError(activity.getString(R.string.permissions_error))
+            permitButton.visibility = View.VISIBLE
+            return
+        }
+        permitButton.visibility = View.GONE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             telephonyManager.requestCellInfoUpdate(
                 Dispatchers.Main.asExecutor(),
@@ -125,6 +157,7 @@ class NetworkInfoTab : Fragment() {
         } else {
             updateNetworkInfo(telephonyManager.allCellInfo)
         }
+
     }
 
     private fun updateNetworkInfo(cellsInfo: List<CellInfo>) {
@@ -147,8 +180,10 @@ class NetworkInfoTab : Fragment() {
                 cellInfo is CellInfoWcdma -> showWcdmaCellInfo(cellInfo)
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo is CellInfoTdscdma ->
                     showTdscdmaCellInfo(cellInfo)
+
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo is CellInfoNr ->
                     showNrCellInfo(cellInfo)
+
                 else -> appendLineToConsole("Unknown cell info ${cellInfo::class}")
             }
             appendLineToConsole("")
