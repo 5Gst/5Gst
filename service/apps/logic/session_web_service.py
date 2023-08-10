@@ -88,7 +88,6 @@ class SessionWebService:
     def stop_iperf(self) -> Response:
         if not self._is_in_session:
             raise BadRequest("Not in session")
-            # raise ValueError("I did it here.")
 
         status_code = iperf.stop()
         if status_code != 0:
