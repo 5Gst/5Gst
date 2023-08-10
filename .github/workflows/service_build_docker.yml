@@ -31,7 +31,7 @@ jobs:
           echo "version=$(cat ../VERSION)" > $GITHUB_ENV
 
       - name: "[Fork] Build docker image"
-        if: github.repository != '5gst/5gst'
+        if: github.repository != '5gst/5gst' || github.event_name != 'push'
         run: docker build . --tag new_service_image:${{ env.version }}.${{ github.run_number }}
 
       - name: "[Main] Log in to Docker Hub"

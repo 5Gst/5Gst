@@ -15,9 +15,6 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from drf_yasg import openapi
-from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.inspectors import SwaggerAutoSchema
 
 load_dotenv()
 
@@ -112,7 +109,12 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'EXCEPTION_HANDLER': 'apps.logic.utils.exception_handler.handle_exception',
 }
+
+from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.inspectors import SwaggerAutoSchema
 
 DEFAULT_SWAGGER_TAG = os.getenv('DEFAULT_SWAGGER_TAG', 'service')
 
