@@ -39,12 +39,6 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Jetbrains temp files
-.idea/
-
-# IPerf statistics logs
-iperf_stats_logs/*.json
-
 # Unit test / coverage reports
 htmlcov/
 .tox/

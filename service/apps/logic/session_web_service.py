@@ -1,5 +1,6 @@
 import logging
 
+from django.http import Http404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -7,7 +8,7 @@ from rest_framework.response import Response
 
 from apps import serializers
 from apps.logic.iperf_wrapper import iperf
-from apps.logic.utils.custom_exceptions import BadRequest
+from apps.logic.utils.custom_exceptions import BadRequest, InternalServerError
 from apps.logic.watchdog import WatchdogService
 from apps.logic.watchdog_service import balancer_communication_watchdog_service, iperf_stop_watchdog_service
 from service import settings
@@ -67,7 +68,7 @@ class SessionWebService:
 
     def start_iperf(self, iperf_args: str) -> Response:
         if not self._is_in_session:
-            raise BadRequest
+            raise BadRequest("Not in session")
 
         self._stop_watchdog_service.reset_timer()
 
@@ -79,8 +80,7 @@ class SessionWebService:
             return Response(data=f"iPerf started with parameters {iperf.iperf_parameters}",
                             status=status.HTTP_200_OK)
         else:
-            logger.error("Failed to start iperf")
-            return Response("Failed to start iperf", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise InternalServerError("Failed to start iperf")
 
     stop_iperf_swagger_auto_schema = swagger_auto_schema(
         operation_id='stop_iperf',
@@ -88,7 +88,7 @@ class SessionWebService:
 
     def stop_iperf(self) -> Response:
         if not self._is_in_session:
-            raise BadRequest
+            raise BadRequest("Not in session")
 
         status_code = iperf.stop()
         if status_code != 0:

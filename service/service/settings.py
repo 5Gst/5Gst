@@ -109,7 +109,7 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
-    'EXCEPTION_HANDLER': 'apps.logic.utils.custom_exception_handler.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'apps.logic.utils.exception_handler.handle_exception',
 }
 
 from drf_yasg import openapi
