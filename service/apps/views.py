@@ -39,4 +39,5 @@ class StopIperfView(APIView):
 class IperfSpeedProbesView(APIView):
     @SessionWebService.get_iperf_speed_results_swagger_auto_schema
     def get(self, request: Request):
-        return session_web_service.get_iperf_speed_results(request)
+        start_index = request.GET.get('from_probe', default=None)
+        return session_web_service.get_iperf_speed_probes(start_index)

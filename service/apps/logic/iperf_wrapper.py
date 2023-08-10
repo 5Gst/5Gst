@@ -19,7 +19,7 @@ class IperfWrapper:
         self.iperf_waiting_thread: Thread = None
         self.iperf_process: subprocess.Popen = None
         self.iperf_active_parsed_speed_container = None
-        self.is_udp_downloading = False
+        self.is_udp_uploading = False
 
         self.verbose: bool = verbose
         self.is_started: bool = False
@@ -31,8 +31,8 @@ class IperfWrapper:
 
     def __create_text_io_stream_processor_thread(self, stream: IO, file: TextIOWrapper):
         def process_stream(stream: IO, file: TextIOWrapper):
-            if self.is_udp_downloading:
-                self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadSpeedResultsContainer()
+            if self.is_udp_uploading:
+                self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadMeasurementContainer()
             for stdout_line in iter(stream.readline, ""):
                 if self.iperf_active_parsed_speed_container is not None:
                     self.iperf_active_parsed_speed_container.append_line(str(stdout_line))
@@ -41,7 +41,6 @@ class IperfWrapper:
                 file.flush()
                 if self.verbose:
                     logger.debug(stdout_line.replace('\n', ""))
-            self.iperf_active_parsed_speed_container = None
             stream.close()
             file.close()
 
@@ -74,20 +73,24 @@ class IperfWrapper:
         self.is_started = False
         logger.info(f"iPerf stopped with status {return_code}")
 
-    def check_for_udp_download_mode(self, cmd):
+    def handle_udp_download_mode(self, cmd):
         # Check if we're having UDP download session
         if '-u' in cmd:
-            cmd += shlex.split(" -f b -i 0.1 -P 10 -b 120m --sum-only")
-            self.is_udp_downloading = True
+            cmd += shlex.split(" -f b -i 0.1 --sum-only")
+            self.is_udp_uploading = True
         return cmd
+
+    def wipe_probes_container(self):
+        self.iperf_active_parsed_speed_container = None
+        logger.info("Iperf probes container was wiped")
 
     def start(self, port_iperf):
         if not self.is_started:
             output_file, error_file = self.__create_logs_stream()
             cmd = shlex.split(
                 "./iperf.elf " + '-p ' + str(port_iperf) + ' ' + self.iperf_parameters)
-            cmd = self.check_for_udp_download_mode(cmd)
-
+            cmd = self.handle_udp_download_mode(cmd)
+            self.wipe_probes_container()
             self.iperf_process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             logger.info(f"iPerf is started using command {cmd}")
@@ -112,7 +115,7 @@ class IperfWrapper:
     def stop(self):
         if self.iperf_process is None:
             return 0
-        self.is_udp_downloading = False
+        self.is_udp_uploading = False
         self.iperf_process.terminate()
         self.iperf_waiting_thread.join()
         return_code = self.iperf_process.poll()
