@@ -27,34 +27,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * IperfSpeedResults
+ * IperfSpeedProbes
  */
 
-public class IperfSpeedResults {
-  @SerializedName("results")
-  private List<Integer> results = new ArrayList<>();
+public class IperfSpeedProbes {
+  @SerializedName("probes")
+  private List<Integer> probes = new ArrayList<>();
 
-  public IperfSpeedResults results(List<Integer> results) {
-    this.results = results;
+  public IperfSpeedProbes probes(List<Integer> probes) {
+    this.probes = probes;
     return this;
   }
 
-  public IperfSpeedResults addResultsItem(Integer resultsItem) {
-    this.results.add(resultsItem);
+  public IperfSpeedProbes addProbesItem(Integer probesItem) {
+    this.probes.add(probesItem);
     return this;
   }
 
    /**
-   * Get results
-   * @return results
+   * Get probes
+   * @return probes
   **/
   @ApiModelProperty(required = true, value = "")
-  public List<Integer> getResults() {
-    return results;
+  public List<Integer> getProbes() {
+    return probes;
   }
 
-  public void setResults(List<Integer> results) {
-    this.results = results;
+  public void setProbes(List<Integer> probes) {
+    this.probes = probes;
   }
 
 
@@ -66,22 +66,22 @@ public class IperfSpeedResults {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IperfSpeedResults iperfSpeedResults = (IperfSpeedResults) o;
-    return Objects.equals(this.results, iperfSpeedResults.results);
+    IperfSpeedProbes iperfSpeedProbes = (IperfSpeedProbes) o;
+    return Objects.equals(this.probes, iperfSpeedProbes.probes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(results);
+    return Objects.hash(probes);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IperfSpeedResults {\n");
+    sb.append("class IperfSpeedProbes {\n");
     
-    sb.append("    results: ").append(toIndentedString(results)).append("\n");
+    sb.append("    probes: ").append(toIndentedString(probes)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -28,7 +28,7 @@ import java.io.IOException;
 
 
 import ru.scoltech.openran.speedtest.client.service.model.IperfArgs;
-import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedResults;
+import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedProbes;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -56,18 +56,18 @@ public class ServiceApi {
     }
 
     /**
-     * Build call for iperfSpeedResults
+     * Build call for iperfSpeedProbes
      * @param fromFrame  (optional)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call iperfSpeedResultsCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call iperfSpeedProbesCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/api/v1/measurement/results";
+        String localVarPath = "/api/v1/measurement/results/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -107,48 +107,48 @@ public class ServiceApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call iperfSpeedResultsValidateBeforeCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call iperfSpeedProbesValidateBeforeCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
 
-        com.squareup.okhttp.Call call = iperfSpeedResultsCall(fromFrame, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = iperfSpeedProbesCall(fromFrame, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
      * 
-     * Returns iperf speed results
+     * Returns iperf speed probes
      * @param fromFrame  (optional)
-     * @return IperfSpeedResults
+     * @return IperfSpeedProbes
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public IperfSpeedResults iperfSpeedResults(String fromFrame) throws ApiException {
-        ApiResponse<IperfSpeedResults> resp = iperfSpeedResultsWithHttpInfo(fromFrame);
+    public IperfSpeedProbes iperfSpeedProbes(String fromFrame) throws ApiException {
+        ApiResponse<IperfSpeedProbes> resp = iperfSpeedProbesWithHttpInfo(fromFrame);
         return resp.getData();
     }
 
     /**
      * 
-     * Returns iperf speed results
+     * Returns iperf speed probes
      * @param fromFrame  (optional)
-     * @return ApiResponse&lt;IperfSpeedResults&gt;
+     * @return ApiResponse&lt;IperfSpeedProbes&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<IperfSpeedResults> iperfSpeedResultsWithHttpInfo(String fromFrame) throws ApiException {
-        com.squareup.okhttp.Call call = iperfSpeedResultsValidateBeforeCall(fromFrame, null, null);
-        Type localVarReturnType = new TypeToken<IperfSpeedResults>(){}.getType();
+    public ApiResponse<IperfSpeedProbes> iperfSpeedProbesWithHttpInfo(String fromFrame) throws ApiException {
+        com.squareup.okhttp.Call call = iperfSpeedProbesValidateBeforeCall(fromFrame, null, null);
+        Type localVarReturnType = new TypeToken<IperfSpeedProbes>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
     /**
      *  (asynchronously)
-     * Returns iperf speed results
+     * Returns iperf speed probes
      * @param fromFrame  (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call iperfSpeedResultsAsync(String fromFrame, final ApiCallback<IperfSpeedResults> callback) throws ApiException {
+    public com.squareup.okhttp.Call iperfSpeedProbesAsync(String fromFrame, final ApiCallback<IperfSpeedProbes> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -169,8 +169,8 @@ public class ServiceApi {
             };
         }
 
-        com.squareup.okhttp.Call call = iperfSpeedResultsValidateBeforeCall(fromFrame, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<IperfSpeedResults>(){}.getType();
+        com.squareup.okhttp.Call call = iperfSpeedProbesValidateBeforeCall(fromFrame, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<IperfSpeedProbes>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

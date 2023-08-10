@@ -4,20 +4,20 @@ All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**iperfSpeedResults**](ServiceApi.md#iperfSpeedResults) | **GET** /api/v1/measurement/results | 
+[**iperfSpeedProbes**](ServiceApi.md#iperfSpeedProbes) | **GET** /api/v1/measurement/results/ | 
 [**startIperf**](ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start | 
 [**startSession**](ServiceApi.md#startSession) | **POST** /api/v1/session/start | 
 [**stopIperf**](ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop | 
 [**stopSession**](ServiceApi.md#stopSession) | **POST** /api/v1/session/stop | 
 
 
-<a name="iperfSpeedResults"></a>
-# **iperfSpeedResults**
-> IperfSpeedResults iperfSpeedResults(fromFrame)
+<a name="iperfSpeedProbes"></a>
+# **iperfSpeedProbes**
+> IperfSpeedProbes iperfSpeedProbes(fromFrame)
 
 
 
-Returns iperf speed results
+Returns iperf speed probes
 
 ### Example
 ```java
@@ -29,10 +29,10 @@ Returns iperf speed results
 ServiceApi apiInstance = new ServiceApi();
 String fromFrame = "fromFrame_example"; // String | 
 try {
-    IperfSpeedResults result = apiInstance.iperfSpeedResults(fromFrame);
+    IperfSpeedProbes result = apiInstance.iperfSpeedProbes(fromFrame);
     System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling ServiceApi#iperfSpeedResults");
+    System.err.println("Exception when calling ServiceApi#iperfSpeedProbes");
     e.printStackTrace();
 }
 ```
@@ -45,7 +45,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**IperfSpeedResults**](IperfSpeedResults.md)
+[**IperfSpeedProbes**](IperfSpeedProbes.md)
 
 ### Authorization
 

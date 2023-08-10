@@ -1,10 +1,10 @@
 
-# IperfSpeedResults
+# IperfSpeedProbes
 
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**results** | **List&lt;Integer&gt;** |  | 
+**probes** | **List&lt;Integer&gt;** |  | 
 
 
 
