@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from apps import serializers
 from apps.logic.iperf_wrapper import iperf
-from apps.logic.utils.custom_exceptions import BadRequest, InternalServerError
+from apps.logic.utils.exceptions import BadRequest, InternalServerError
 from apps.logic.watchdog import WatchdogService
 from apps.logic.watchdog_service import balancer_communication_watchdog_service, iperf_stop_watchdog_service
 from service import settings
