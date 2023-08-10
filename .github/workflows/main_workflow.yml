@@ -1,0 +1,54 @@
+name: "5Gst CI"
+
+on: [ push, pull_request ]
+
+jobs:
+  balancer-api-codegen:
+    name: "[Balancer] Generate balancer API client using Swagger codegen"
+    uses: ./.github/workflows/balancer_api_codegen.yml
+  service-api-codegen:
+    name: "[Service] Generate service API client using Swagger codegen"
+    uses: ./.github/workflows/service_api_codegen.yml
+  balancer-make-migrations:
+    name: "[Balancer] Generate balancer migration scripts"
+    uses: ./.github/workflows/balancer_make_migrations.yml
+
+  balancer-tests:
+    name: "[Balancer] Run Balancer Tests"
+    needs: [ service-api-codegen, balancer-make-migrations ]
+    uses: ./.github/workflows/balancer_tests.yml
+  balancer-build-docker:
+    name: "[Balancer] Publish balancer docker image to Docker Hub"
+    needs: [ service-api-codegen, balancer-make-migrations ]
+    uses: ./.github/workflows/balancer_build_docker.yml
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  service-tests:
+    name: "[Service] Run Service Tests"
+    needs: [ balancer-api-codegen ]
+    uses: ./.github/workflows/service_tests.yml
+  service-build-docker:
+    name: "[Service] Publish service docker image to Docker Hub"
+    needs: [ balancer-api-codegen ]
+    uses: ./.github/workflows/service_build_docker.yml
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  application-build:
+    name: "[Application] Build Android artifacts"
+    needs: [ service-api-codegen, balancer-api-codegen ]
+    uses: ./.github/workflows/application_build.yml
+    secrets:
+      FIVE_GST_BOT_ACCESS_TOKEN: ${{ secrets.FIVE_GST_BOT_ACCESS_TOKEN }}
+      RELEASE_KEYSTORE_GIT_REPOSITORY: ${{ secrets.RELEASE_KEYSTORE_GIT_REPOSITORY }}
+      RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+      RELEASE_SIGN_KEY_ALIAS: ${{ secrets.RELEASE_SIGN_KEY_ALIAS }}
+      RELEASE_SIGN_KEY_PASSWORD: ${{ secrets.RELEASE_SIGN_KEY_PASSWORD }}
+
+  collect-selfhost-artifacts:
+    name: "Collect self-host artifacts"
+    needs: [ service-build-docker, balancer-build-docker ]
+    uses: ./.github/workflows/main_collect_selfhost_artifacts.yml

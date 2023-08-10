@@ -1,0 +1,46 @@
+name: "Publish balancer docker image to Docker Hub"
+
+on:
+  workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+
+      DOCKER_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  publish-to-dockerhub:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./balancer
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          # Work-around, see https://github.com/actions/checkout/issues/439
+          ref: ${{ github.ref }}
+
+      - name: Setup version variable
+        run: |
+          echo "version=$(cat ../VERSION)" > $GITHUB_ENV
+
+      - name: "[Fork] Build docker image"
+        if: github.repository != '5gst/5gst'
+        run: docker build . --tag new_balancer_image:${{ env.version }}.${{ github.run_number }}
+
+      - name: "[Main] Log in to Docker Hub"
+        if: github.repository == '5gst/5gst' && github.event_name == 'push'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: "[Main] Build and push Docker image"
+        if: github.repository == '5gst/5gst' && github.event_name == 'push'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./balancer
+          push: true
+          tags: 5gst/speedtest-balancer:${{ env.version }}.${{ github.run_number }}, 5gst/speedtest-balancer:latest
