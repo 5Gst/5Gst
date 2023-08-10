@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.core import validators
 from django.db import transaction
@@ -54,3 +55,12 @@ class FiveGstTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FiveGstToken
         fields = ('token', 'expires_at')
+
+
+class IperfStatisticsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.IperfStatistics
+        fields = ('results', 'start_timestamp')
+
+    def create(self, validated_data):
+        return models.IperfStatistics.objects.create(**validated_data)

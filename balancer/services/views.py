@@ -4,6 +4,7 @@ import secrets
 
 from django.conf import settings
 from django.db import transaction, IntegrityError
+from django.http import HttpResponseBadRequest
 from django.utils.timezone import make_aware
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -12,11 +13,14 @@ from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.request import Request
+from rest_framework.serializers import ValidationError
 
 import service_api.rest
 from services import serializers, models
 from services.authentication import FiveGstAuthentication
 from services.models import FiveGstToken
+from services.utils.iperf_measurement_history import IperfMeasurementHistoryAPI, user_measurement_history
 
 logger = logging.getLogger(__name__)
 
@@ -143,8 +147,8 @@ class ServiceAcquirementView(APIView):
             if not acquired_address:
                 return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-            was_acquired = models.FiveGstToken.objects\
-                .filter(token=request.user.token.token, acquired_service__isnull=True)\
+            was_acquired = models.FiveGstToken.objects \
+                .filter(token=request.user.token.token, acquired_service__isnull=True) \
                 .update(acquired_service=acquired_address)
             if not was_acquired:
                 return Response('Could not acquire service due to a conflict, try again',
@@ -167,3 +171,26 @@ class PingView(APIView):
     )
     def get(self, request):
         return Response(status=status.HTTP_200_OK)
+
+
+class IperfMeasurementHistoryView(APIView):
+
+    @IperfMeasurementHistoryAPI.read_swagger_auto_schema
+    def get(self, request: Request) -> Response:
+        id = request.query_params.get('id', None)
+        return user_measurement_history.read(id)
+
+    @IperfMeasurementHistoryAPI.create_swagger_auto_schema
+    def post(self, request: Request) -> Response:
+        try:
+            serializer = serializers.IperfStatisticsSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as exc:
+            logger.error(f"Error {exc.status_code} happened: {exc.detail}", exc_info=exc)
+            raise HttpResponseBadRequest
+
+        data = {
+            'results': serializer.validated_data['results'],
+            'start_timestamp': serializer.validated_data['start_timestamp'],
+        }
+        return user_measurement_history.create(data)

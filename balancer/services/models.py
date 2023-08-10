@@ -52,3 +52,9 @@ class FiveGstToken(models.Model):
         indexes = [
             models.Index(fields=('expires_at',))
         ]
+
+
+class IperfStatistics(models.Model):
+    results = models.JSONField()
+    start_timestamp = models.DateTimeField()
+

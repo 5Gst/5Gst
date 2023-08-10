@@ -5,9 +5,11 @@ All URIs are relative to *https://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**acquireService**](BalancerApi.md#acquireService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/acquire/ | 
+[**create**](BalancerApi.md#create) | **POST** /5gst/iperf_load_balancer/0.1.0/service/stats/ | 
 [**login**](BalancerApi.md#login) | **POST** /5gst/iperf_load_balancer/0.1.0/login/ | 
 [**logout**](BalancerApi.md#logout) | **POST** /5gst/iperf_load_balancer/0.1.0/logout/ | 
 [**ping**](BalancerApi.md#ping) | **GET** /5gst/iperf_load_balancer/0.1.0/ping/ | 
+[**read**](BalancerApi.md#read) | **GET** /5gst/iperf_load_balancer/0.1.0/service/stats/ | 
 [**registerService**](BalancerApi.md#registerService) | **POST** /5gst/iperf_load_balancer/0.1.0/service/ | 
 [**unregisterService**](BalancerApi.md#unregisterService) | **DELETE** /5gst/iperf_load_balancer/0.1.0/service/ | 
 
@@ -53,6 +55,56 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**ServerAddressResponse**](ServerAddressResponse.md)
+
+### Authorization
+
+[5Gst](../README.md#5Gst)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="create"></a>
+# **create**
+> create()
+
+
+
+
+
+### Example
+```java
+// Import classes:
+//import ru.scoltech.openran.speedtest.client.balancer.ApiClient;
+//import ru.scoltech.openran.speedtest.client.balancer.ApiException;
+//import ru.scoltech.openran.speedtest.client.balancer.Configuration;
+//import ru.scoltech.openran.speedtest.client.balancer.auth.*;
+//import ru.scoltech.openran.speedtest.client.balancer.api.BalancerApi;
+
+ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+// Configure API key authorization: 5Gst
+ApiKeyAuth 5Gst = (ApiKeyAuth) defaultClient.getAuthentication("5Gst");
+5Gst.setApiKey("YOUR API KEY");
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//5Gst.setApiKeyPrefix("Token");
+
+BalancerApi apiInstance = new BalancerApi();
+try {
+    apiInstance.create();
+} catch (ApiException e) {
+    System.err.println("Exception when calling BalancerApi#create");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+null (empty response body)
 
 ### Authorization
 
@@ -188,6 +240,56 @@ null (empty response body)
 ### Authorization
 
 No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="read"></a>
+# **read**
+> read()
+
+
+
+
+
+### Example
+```java
+// Import classes:
+//import ru.scoltech.openran.speedtest.client.balancer.ApiClient;
+//import ru.scoltech.openran.speedtest.client.balancer.ApiException;
+//import ru.scoltech.openran.speedtest.client.balancer.Configuration;
+//import ru.scoltech.openran.speedtest.client.balancer.auth.*;
+//import ru.scoltech.openran.speedtest.client.balancer.api.BalancerApi;
+
+ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+// Configure API key authorization: 5Gst
+ApiKeyAuth 5Gst = (ApiKeyAuth) defaultClient.getAuthentication("5Gst");
+5Gst.setApiKey("YOUR API KEY");
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//5Gst.setApiKeyPrefix("Token");
+
+BalancerApi apiInstance = new BalancerApi();
+try {
+    apiInstance.read();
+} catch (ApiException e) {
+    System.err.println("Exception when calling BalancerApi#read");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+[5Gst](../README.md#5Gst)
 
 ### HTTP request headers
 
