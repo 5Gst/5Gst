@@ -31,8 +31,6 @@ class IperfWrapper:
 
     def __create_text_io_stream_processor_thread(self, stream: IO, file: TextIOWrapper):
         def process_stream(stream: IO, file: TextIOWrapper):
-            if self.is_udp_uploading:
-                self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadMeasurementContainer()
             for stdout_line in iter(stream.readline, ""):
                 if self.iperf_active_parsed_speed_container is not None:
                     self.iperf_active_parsed_speed_container.append_line(str(stdout_line))
@@ -43,6 +41,9 @@ class IperfWrapper:
                     logger.debug(stdout_line.replace('\n', ""))
             stream.close()
             file.close()
+
+        if self.is_udp_uploading:
+            self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadMeasurementContainer()
 
         t = Thread(target=process_stream, args=(stream, file))
         t.daemon = True
@@ -73,9 +74,9 @@ class IperfWrapper:
         self.is_started = False
         logger.info(f"iPerf stopped with status {return_code}")
 
-    def handle_udp_download_mode(self, cmd):
-        # Check if we're having UDP download session
-        if '-u' in cmd:
+    def handle_udp_upload_mode(self, cmd):
+        # Check if we're having UDP upload session
+        if '-u' in cmd and '-R' not in cmd:
             cmd += shlex.split(" -f b -i 0.1 --sum-only")
             self.is_udp_uploading = True
         return cmd
@@ -89,8 +90,7 @@ class IperfWrapper:
             output_file, error_file = self.__create_logs_stream()
             cmd = shlex.split(
                 "./iperf.elf " + '-p ' + str(port_iperf) + ' ' + self.iperf_parameters)
-            cmd = self.handle_udp_download_mode(cmd)
-            self.wipe_probes_container()
+            cmd = self.handle_udp_upload_mode(cmd)
             self.iperf_process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             logger.info(f"iPerf is started using command {cmd}")

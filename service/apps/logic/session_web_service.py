@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -39,6 +40,7 @@ class SessionWebService:
         balancer_communication_watchdog_service.stop()
         self._stop_watchdog_service.start()
         self._is_in_session = True
+        iperf_wrapper.iperf.wipe_probes_container()
         return Response("Session started", status=status.HTTP_200_OK)
 
     stop_session_swagger_auto_schema = swagger_auto_schema(
@@ -49,6 +51,7 @@ class SessionWebService:
         if not self._is_in_session:
             return Response("Not in session", status=status.HTTP_200_OK)
 
+        iperf_wrapper.iperf.wipe_probes_container()
         self.stop_iperf()
         if not is_called_by_timeout:
             self._stop_watchdog_service.stop()
@@ -90,7 +93,6 @@ class SessionWebService:
         if not self._is_in_session:
             return Response("Not in session", status=status.HTTP_400_BAD_REQUEST)
 
-        iperf_wrapper.iperf.wipe_probes_container()
         status_code = iperf_wrapper.iperf.stop()
         if status_code != 0:
             logger.error(f"Iperf was stopped with status code {status_code}")
@@ -110,17 +112,19 @@ class SessionWebService:
             ),
         ],
         responses={
-            200: openapi.Response('Speed results are successfully returned',
-                                  serializers.IperfDownloadMeasurementSerializer),
+            200: openapi.Response('Speed results are successfully returned', serializers.IperfMeasurementSerializer),
 
         },
     )
 
-    def get_iperf_speed_probes(self, start_index: int):
-        if iperf_wrapper.iperf.iperf_active_parsed_speed_container is None or start_index is None:
+    def get_iperf_speed_probes(self, start_index: Optional[int]):
+        if iperf_wrapper.iperf.iperf_active_parsed_speed_container is None:
             raise BadRequest("Requested Iperf speed probes on closed / non-existing session")
+        if start_index is None:
+            raise BadRequest("Request contains an invalid start_index or it's missing")
+
         model = iperf_wrapper.iperf.iperf_active_parsed_speed_container.get_from_probe(int(start_index))
-        serialized_model = serializers.IperfDownloadMeasurementSerializer(model)
+        serialized_model = serializers.IperfMeasurementSerializer(model)
 
         return Response(data=serialized_model.data, status=status.HTTP_200_OK)
 

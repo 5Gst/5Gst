@@ -12,7 +12,7 @@ class IperfDownloadMeasurementContainer:
                             "\\.\\d+)?\\s+Bytes\\s+(" \
                             "\\d+)(\\.\\d+)?\\s+bits/sec.*$"
 
-    def __init__(self, probes: list[IperfSpeedProbe] = None):
+    def __init__(self, probes = None):
         if probes is None:
             self.probes = []
         else:

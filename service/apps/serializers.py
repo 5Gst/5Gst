@@ -6,8 +6,8 @@ class IperfArgsSerializer(serializers.Serializer):
 
 
 class IperfSpeedProbeSerializer(serializers.Serializer):
-    bits_per_second = serializers.IntegerField(allow_null=True)
+    bits_per_second = serializers.IntegerField()
 
 
-class IperfDownloadMeasurementSerializer(serializers.Serializer):
+class IperfMeasurementSerializer(serializers.Serializer):
     probes = IperfSpeedProbeSerializer(many=True)
