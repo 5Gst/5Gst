@@ -42,9 +42,6 @@ class IperfWrapper:
             stream.close()
             file.close()
 
-        if self.is_udp_uploading:
-            self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadMeasurementContainer()
-
         t = Thread(target=process_stream, args=(stream, file))
         t.daemon = True
         t.start()
@@ -91,6 +88,9 @@ class IperfWrapper:
             cmd = shlex.split(
                 "./iperf.elf " + '-p ' + str(port_iperf) + ' ' + self.iperf_parameters)
             cmd = self.handle_udp_upload_mode(cmd)
+            self.wipe_probes_container()
+            if self.is_udp_uploading:
+                self.iperf_active_parsed_speed_container = iperf_parser_container.IperfDownloadMeasurementContainer()
             self.iperf_process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             logger.info(f"iPerf is started using command {cmd}")

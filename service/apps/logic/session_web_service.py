@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -40,7 +39,6 @@ class SessionWebService:
         balancer_communication_watchdog_service.stop()
         self._stop_watchdog_service.start()
         self._is_in_session = True
-        iperf_wrapper.iperf.wipe_probes_container()
         return Response("Session started", status=status.HTTP_200_OK)
 
     stop_session_swagger_auto_schema = swagger_auto_schema(
@@ -117,11 +115,9 @@ class SessionWebService:
         },
     )
 
-    def get_iperf_speed_probes(self, start_index: Optional[int]):
+    def get_iperf_speed_probes(self, start_index: int):
         if iperf_wrapper.iperf.iperf_active_parsed_speed_container is None:
             raise BadRequest("Requested Iperf speed probes on closed / non-existing session")
-        if start_index is None:
-            raise BadRequest("Request contains an invalid start_index or it's missing")
 
         model = iperf_wrapper.iperf.iperf_active_parsed_speed_container.get_from_probe(start_index)
         serialized_model = serializers.IperfMeasurementSerializer(model)

@@ -1,6 +1,7 @@
 import logging
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from django.core.exceptions import BadRequest
 from apps.logic.session_web_service import session_web_service, SessionWebService
 from apps import serializers
 
@@ -40,4 +41,6 @@ class IperfSpeedProbesView(APIView):
     @SessionWebService.get_iperf_speed_results_swagger_auto_schema
     def get(self, request: Request):
         start_index = request.GET.get('from_probe', default=None)
+        if start_index is None:
+                raise BadRequest("Request contains an invalid start_index or it's missing")
         return session_web_service.get_iperf_speed_probes(int(start_index))
