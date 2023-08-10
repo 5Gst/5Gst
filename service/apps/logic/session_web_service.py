@@ -123,7 +123,7 @@ class SessionWebService:
         if start_index is None:
             raise BadRequest("Request contains an invalid start_index or it's missing")
 
-        model = iperf_wrapper.iperf.iperf_active_parsed_speed_container.get_from_probe(int(start_index))
+        model = iperf_wrapper.iperf.iperf_active_parsed_speed_container.get_from_probe(start_index)
         serialized_model = serializers.IperfMeasurementSerializer(model)
 
         return Response(data=serialized_model.data, status=status.HTTP_200_OK)
