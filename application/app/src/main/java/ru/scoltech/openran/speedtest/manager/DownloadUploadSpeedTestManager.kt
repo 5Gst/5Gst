@@ -2,7 +2,6 @@ package ru.scoltech.openran.speedtest.manager
 
 import android.content.Context
 import com.squareup.okhttp.HttpUrl
-import io.swagger.annotations.Api
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.MultithreadedIperfOutputParser
@@ -148,6 +147,17 @@ private constructor(
         stopServiceIperfTask: StopServiceIperfTask,
         idleBetweenTasksMelees: Long,
     ): TaskConsumer<ApiClientHolder> {
+        val startUdpUploadIperfTask = StartUdpUploadIperfTask(
+            context.filesDir.absolutePath,
+            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+            SkipThenAverageEqualizer(
+                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                DEFAULT_EQUALIZER_MAX_STORING
+            ),
+            DEFAULT_TIMEOUT.toLong(),
+            onStageSpeedUpdate,
+            onLog,
+        )
         mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
             .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
@@ -155,19 +165,7 @@ private constructor(
                 initializeNewChain()
                     .andThen(startServiceIperfTask)
                     .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
-                    .andThen(
-                        StartUdpUploadIperfTask(
-                            context.filesDir.absolutePath,
-                            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
-                            SkipThenAverageEqualizer(
-                                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
-                                DEFAULT_EQUALIZER_MAX_STORING
-                            ),
-                            DEFAULT_TIMEOUT.toLong(),
-                            onStageSpeedUpdate,
-                            onLog,
-                        )
-                    )
+                    .andThen(startUdpUploadIperfTask)
             }
             .andThenFinally(stopServiceIperfTask)
             .andThen(
@@ -187,6 +185,19 @@ private constructor(
         stopServiceIperfTask: StopServiceIperfTask,
         idleBetweenTasksMelees: Long,
     ): TaskConsumer<ApiClientHolder> {
+        val startIperfTask = StartIperfTask(
+            context.filesDir.absolutePath,
+            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+            MultithreadedIperfOutputParser(),
+            SkipThenAverageEqualizer(
+                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                DEFAULT_EQUALIZER_MAX_STORING
+            ),
+            DEFAULT_TIMEOUT.toLong(),
+            onStageSpeedUpdate,
+            { onStageFinish(stageConfiguration, it) },
+            onLog,
+        )
         mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
             .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
@@ -195,21 +206,7 @@ private constructor(
                     .andThen(startServiceIperfTask)
                     .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
                     .withArgumentExtracted { it.iperfAddress }
-                    .doTask(
-                        StartIperfTask(
-                            context.filesDir.absolutePath,
-                            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
-                            MultithreadedIperfOutputParser(),
-                            SkipThenAverageEqualizer(
-                                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
-                                DEFAULT_EQUALIZER_MAX_STORING
-                            ),
-                            DEFAULT_TIMEOUT.toLong(),
-                            onStageSpeedUpdate,
-                            { onStageFinish(stageConfiguration, it) },
-                            onLog,
-                        )
-                    )
+                    .doTask(startIperfTask)
             }
             .andThenFinally(stopServiceIperfTask)
             .andThen(DelayTask(idleBetweenTasksMelees))

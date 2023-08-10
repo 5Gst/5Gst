@@ -8,20 +8,16 @@ import java.util.concurrent.atomic.AtomicInteger
 class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
     private val onLog: (String, String, Exception?) -> Unit,
-    private val process: (List<Int>) -> Unit
+    private val saveMeasurement: (List<Int>) -> Unit
 ) : Runnable {
 
     private val fromFrame = AtomicInteger(0)
-    private var results = Collections.synchronizedList(ArrayList<Int>())
-
     override fun run() {
         while (true) {
             try {
-                results = Collections.synchronizedList(
-                    apiClientHolder.serviceApiClient.iperfSpeedResults(fromFrame.toString()).results
-                )
+                val results =  apiClientHolder.serviceApiClient.iperfSpeedResults(fromFrame.toString()).results
                 fromFrame.set(fromFrame.get() + results.size)
-                process(Collections.synchronizedList(results))
+                saveMeasurement(results)
                 Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 onLog(LOG_TAG, "thread interrupted while running $e", e)
@@ -34,7 +30,7 @@ class IperfMeasurementPinger(
     }
 
     companion object {
-        const val LOG_TAG = "GetDataByURL"
+        const val LOG_TAG = "IperfMeasurementPinger"
     }
 
 }

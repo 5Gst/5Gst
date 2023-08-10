@@ -35,16 +35,15 @@ class StartUdpUploadIperfTask(
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
         val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
-            for (i in 0 until data.size) {
-                if (speedEqualizer.accept(data[i].toLong())) {
-                    if (speedEqualizer.accept(data[i].toLong())) {
-                        val equalizedSpeed = try {
-                            speedEqualizer.getEqualized()
-                        } catch (e: Equalizer.NoValueException) {
-                            onLog(LOG_TAG, "Equalizer $e", e)
-                        }
-                        onSpeedUpdate(speedStatistics, data[i].toLong())
+            for (el in data) {
+            if (speedEqualizer.accept(el.toLong())) {
+                    val equalizedSpeed = try {
+                        speedEqualizer.getEqualized()
+                    } catch (e: Equalizer.NoValueException) {
+                        onLog(LOG_TAG, "Equalizer $e", e)
+                        return@IperfMeasurementPinger
                     }
+                    onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
                 }
             }
         }
@@ -95,11 +94,9 @@ class StartUdpUploadIperfTask(
         private val onFinish: () -> Unit,
     ) {
 
-        var i = 0
         fun onIperfStdoutLine(line: String) {
             idleTaskKiller.updateTaskState()
-            Log.i("i", i.toString())
-            i+=1
+            onLog("line",line, null)
         }
 
         fun onIperfStderrLine(line: String) {
