@@ -5,5 +5,9 @@ class IperfArgsSerializer(serializers.Serializer):
     iperf_args = serializers.CharField(allow_blank=True, allow_null=True)
 
 
-class IperfSpeedResultsSerializer(serializers.Serializer):
-    results = serializers.ListField(child=serializers.IntegerField())
+class IperfSpeedProbeSerializer(serializers.Serializer):
+    bits_per_second = serializers.IntegerField()
+
+
+class IperfMeasurementSerializer(serializers.Serializer):
+    probes = IperfSpeedProbeSerializer(many=True)
