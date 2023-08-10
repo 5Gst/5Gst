@@ -18,5 +18,5 @@ class BadRequest(ClientError):
 
 
 class InternalServerError(ClientError):
-    def __init__(self, detail='Internal Server Error 400'):
+    def __init__(self, detail='Internal Server Error 500'):
         super().__init__(detail, status.HTTP_500_INTERNAL_SERVER_ERROR)
