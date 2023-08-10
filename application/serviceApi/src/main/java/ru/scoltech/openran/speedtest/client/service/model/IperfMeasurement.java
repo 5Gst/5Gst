@@ -25,21 +25,22 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedProbe;
 
 /**
- * IperfSpeedProbes
+ * IperfMeasurement
  */
 
-public class IperfSpeedProbes {
+public class IperfMeasurement {
   @SerializedName("probes")
-  private List<Integer> probes = new ArrayList<>();
+  private List<IperfSpeedProbe> probes = new ArrayList<>();
 
-  public IperfSpeedProbes probes(List<Integer> probes) {
+  public IperfMeasurement probes(List<IperfSpeedProbe> probes) {
     this.probes = probes;
     return this;
   }
 
-  public IperfSpeedProbes addProbesItem(Integer probesItem) {
+  public IperfMeasurement addProbesItem(IperfSpeedProbe probesItem) {
     this.probes.add(probesItem);
     return this;
   }
@@ -49,11 +50,11 @@ public class IperfSpeedProbes {
    * @return probes
   **/
   @ApiModelProperty(required = true, value = "")
-  public List<Integer> getProbes() {
+  public List<IperfSpeedProbe> getProbes() {
     return probes;
   }
 
-  public void setProbes(List<Integer> probes) {
+  public void setProbes(List<IperfSpeedProbe> probes) {
     this.probes = probes;
   }
 
@@ -66,8 +67,8 @@ public class IperfSpeedProbes {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IperfSpeedProbes iperfSpeedProbes = (IperfSpeedProbes) o;
-    return Objects.equals(this.probes, iperfSpeedProbes.probes);
+    IperfMeasurement iperfMeasurement = (IperfMeasurement) o;
+    return Objects.equals(this.probes, iperfMeasurement.probes);
   }
 
   @Override
@@ -79,7 +80,7 @@ public class IperfSpeedProbes {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IperfSpeedProbes {\n");
+    sb.append("class IperfMeasurement {\n");
     
     sb.append("    probes: ").append(toIndentedString(probes)).append("\n");
     sb.append("}");

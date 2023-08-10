@@ -33,45 +33,45 @@ class ServiceApi(object):
             api_client = ApiClient()
         self.api_client = api_client
 
-    def iperf_speed_probes(self, **kwargs):  # noqa: E501
-        """iperf_speed_probes  # noqa: E501
+    def get_iperf_speed_probes(self, **kwargs):  # noqa: E501
+        """get_iperf_speed_probes  # noqa: E501
 
         Returns iperf speed probes  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.iperf_speed_probes(async_req=True)
+        >>> thread = api.get_iperf_speed_probes(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str from_frame:
-        :return: IperfSpeedProbes
+        :param int from_probe:
+        :return: IperfMeasurement
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.iperf_speed_probes_with_http_info(**kwargs)  # noqa: E501
+            return self.get_iperf_speed_probes_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.iperf_speed_probes_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.get_iperf_speed_probes_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def iperf_speed_probes_with_http_info(self, **kwargs):  # noqa: E501
-        """iperf_speed_probes  # noqa: E501
+    def get_iperf_speed_probes_with_http_info(self, **kwargs):  # noqa: E501
+        """get_iperf_speed_probes  # noqa: E501
 
         Returns iperf speed probes  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.iperf_speed_probes_with_http_info(async_req=True)
+        >>> thread = api.get_iperf_speed_probes_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str from_frame:
-        :return: IperfSpeedProbes
+        :param int from_probe:
+        :return: IperfMeasurement
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['from_frame']  # noqa: E501
+        all_params = ['from_probe']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -82,7 +82,7 @@ class ServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method iperf_speed_probes" % key
+                    " to method get_iperf_speed_probes" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -92,8 +92,8 @@ class ServiceApi(object):
         path_params = {}
 
         query_params = []
-        if 'from_frame' in params:
-            query_params.append(('from_frame', params['from_frame']))  # noqa: E501
+        if 'from_probe' in params:
+            query_params.append(('from_probe', params['from_probe']))  # noqa: E501
 
         header_params = {}
 
@@ -120,7 +120,7 @@ class ServiceApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='IperfSpeedProbes',  # noqa: E501
+            response_type='IperfMeasurement',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -212,7 +212,7 @@ class ServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/iperf/start', 'POST',
+            '/api/v1/iperf/start/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -303,7 +303,7 @@ class ServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/session/start', 'POST',
+            '/api/v1/session/start/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -394,7 +394,7 @@ class ServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/iperf/stop', 'POST',
+            '/api/v1/iperf/stop/', 'POST',
             path_params,
             query_params,
             header_params,
@@ -485,7 +485,7 @@ class ServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/session/stop', 'POST',
+            '/api/v1/session/stop/', 'POST',
             path_params,
             query_params,
             header_params,

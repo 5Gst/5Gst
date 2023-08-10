@@ -23,4 +23,5 @@ from service_api.api_client import ApiClient
 from service_api.configuration import Configuration
 # import models into sdk package
 from service_api.models.iperf_args import IperfArgs
-from service_api.models.iperf_speed_probes import IperfSpeedProbes
+from service_api.models.iperf_measurement import IperfMeasurement
+from service_api.models.iperf_speed_probe import IperfSpeedProbe

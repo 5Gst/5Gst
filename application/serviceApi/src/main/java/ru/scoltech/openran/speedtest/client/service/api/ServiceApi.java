@@ -28,7 +28,7 @@ import java.io.IOException;
 
 
 import ru.scoltech.openran.speedtest.client.service.model.IperfArgs;
-import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedProbes;
+import ru.scoltech.openran.speedtest.client.service.model.IperfMeasurement;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -56,14 +56,14 @@ public class ServiceApi {
     }
 
     /**
-     * Build call for iperfSpeedProbes
-     * @param fromFrame  (optional)
+     * Build call for getIperfSpeedProbes
+     * @param fromProbe  (optional)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call iperfSpeedProbesCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call getIperfSpeedProbesCall(Integer fromProbe, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -71,8 +71,8 @@ public class ServiceApi {
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
-        if (fromFrame != null)
-        localVarQueryParams.addAll(apiClient.parameterToPair("from_frame", fromFrame));
+        if (fromProbe != null)
+        localVarQueryParams.addAll(apiClient.parameterToPair("from_probe", fromProbe));
 
         Map<String, String> localVarHeaderParams = new HashMap<String, String>();
 
@@ -107,10 +107,10 @@ public class ServiceApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call iperfSpeedProbesValidateBeforeCall(String fromFrame, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getIperfSpeedProbesValidateBeforeCall(Integer fromProbe, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
 
-        com.squareup.okhttp.Call call = iperfSpeedProbesCall(fromFrame, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = getIperfSpeedProbesCall(fromProbe, progressListener, progressRequestListener);
         return call;
 
     }
@@ -118,37 +118,37 @@ public class ServiceApi {
     /**
      * 
      * Returns iperf speed probes
-     * @param fromFrame  (optional)
-     * @return IperfSpeedProbes
+     * @param fromProbe  (optional)
+     * @return IperfMeasurement
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public IperfSpeedProbes iperfSpeedProbes(String fromFrame) throws ApiException {
-        ApiResponse<IperfSpeedProbes> resp = iperfSpeedProbesWithHttpInfo(fromFrame);
+    public IperfMeasurement getIperfSpeedProbes(Integer fromProbe) throws ApiException {
+        ApiResponse<IperfMeasurement> resp = getIperfSpeedProbesWithHttpInfo(fromProbe);
         return resp.getData();
     }
 
     /**
      * 
      * Returns iperf speed probes
-     * @param fromFrame  (optional)
-     * @return ApiResponse&lt;IperfSpeedProbes&gt;
+     * @param fromProbe  (optional)
+     * @return ApiResponse&lt;IperfMeasurement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<IperfSpeedProbes> iperfSpeedProbesWithHttpInfo(String fromFrame) throws ApiException {
-        com.squareup.okhttp.Call call = iperfSpeedProbesValidateBeforeCall(fromFrame, null, null);
-        Type localVarReturnType = new TypeToken<IperfSpeedProbes>(){}.getType();
+    public ApiResponse<IperfMeasurement> getIperfSpeedProbesWithHttpInfo(Integer fromProbe) throws ApiException {
+        com.squareup.okhttp.Call call = getIperfSpeedProbesValidateBeforeCall(fromProbe, null, null);
+        Type localVarReturnType = new TypeToken<IperfMeasurement>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
     /**
      *  (asynchronously)
      * Returns iperf speed probes
-     * @param fromFrame  (optional)
+     * @param fromProbe  (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call iperfSpeedProbesAsync(String fromFrame, final ApiCallback<IperfSpeedProbes> callback) throws ApiException {
+    public com.squareup.okhttp.Call getIperfSpeedProbesAsync(Integer fromProbe, final ApiCallback<IperfMeasurement> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -169,8 +169,8 @@ public class ServiceApi {
             };
         }
 
-        com.squareup.okhttp.Call call = iperfSpeedProbesValidateBeforeCall(fromFrame, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<IperfSpeedProbes>(){}.getType();
+        com.squareup.okhttp.Call call = getIperfSpeedProbesValidateBeforeCall(fromProbe, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<IperfMeasurement>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
@@ -186,7 +186,7 @@ public class ServiceApi {
         Object localVarPostBody = data;
 
         // create path and map variables
-        String localVarPath = "/api/v1/iperf/start";
+        String localVarPath = "/api/v1/iperf/start/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -303,7 +303,7 @@ public class ServiceApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/api/v1/session/start";
+        String localVarPath = "/api/v1/session/start/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -412,7 +412,7 @@ public class ServiceApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/api/v1/iperf/stop";
+        String localVarPath = "/api/v1/iperf/stop/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -521,7 +521,7 @@ public class ServiceApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/api/v1/session/stop";
+        String localVarPath = "/api/v1/session/stop/";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();

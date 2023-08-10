@@ -1,10 +1,10 @@
 
-# IperfSpeedProbes
+# IperfSpeedProbe
 
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**probes** | **List&lt;Integer&gt;** |  | 
+**bitsPerSecond** | **Integer** |  | 
 
 
 
