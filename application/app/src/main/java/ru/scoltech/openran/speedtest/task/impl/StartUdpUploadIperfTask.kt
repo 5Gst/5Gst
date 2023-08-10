@@ -2,6 +2,7 @@ package ru.scoltech.openran.speedtest.task.impl
 
 import android.location.GnssMeasurement
 import android.util.Log
+import org.apache.commons.collections.list.SynchronizedList
 import ru.scoltech.openran.speedtest.backend.IperfException
 import ru.scoltech.openran.speedtest.backend.IperfRunner
 import ru.scoltech.openran.speedtest.parser.IperfOutputParser
@@ -19,27 +20,36 @@ import java.util.LongSummaryStatistics
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class StartUdpUploadIperfTask (
+class StartUdpUploadIperfTask(
     private val writableDir: String,
     private val args: String,
-    private val speedParser: IperfOutputParser,
     private val speedEqualizer: SkipThenAverageEqualizer,
     private val idleTimeoutMillis: Long,
     private val onSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
 ) : Task<ApiClientHolder, ApiClientHolder> {
-
-
-    private val speedStatistics = LongSummaryStatistics()
-
+    private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
     override fun prepare(
         argument: ApiClientHolder,
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
-        val api = GetDataByURL(argument)
-        val thread = Thread(api)
-        val processor = IperfOutputProcessor(idleTaskKiller, speedEqualizer.copy(), api, thread) {
+        val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
+            for (i in 0 until data.size) {
+                if (speedEqualizer.accept(data[i].toLong())) {
+                    if (speedEqualizer.accept(data[i].toLong())) {
+                        val equalizedSpeed = try {
+                            speedEqualizer.getEqualized()
+                        } catch (e: Equalizer.NoValueException) {
+                            onLog(LOG_TAG, "Equalizer $e", e)
+                        }
+                        onSpeedUpdate(speedStatistics, data[i].toLong())
+                    }
+                }
+            }
+        }
+        val thread = Thread(measurementPinger)
+        val processor = IperfOutputProcessor(idleTaskKiller, thread) {
             onSuccess?.invoke(argument)
         }
 
@@ -49,7 +59,6 @@ class StartUdpUploadIperfTask (
             .onFinishCallback(processor::onIperfFinish)
             .build()
 
-        Log.i("started","started")
 
         while (true) {
             try {
@@ -80,39 +89,17 @@ class StartUdpUploadIperfTask (
         }
     }
 
-    public fun getStatistics() : LongSummaryStatistics{
-        return speedStatistics
-    }
-
     private inner class IperfOutputProcessor(
         private val idleTaskKiller: IdleTaskKiller,
-        private val speedEqualizer: SkipThenAverageEqualizer,
-        private val measurementResults: GetDataByURL,
         private val thread: Thread,
         private val onFinish: () -> Unit,
     ) {
-        private val lock = ReentrantLock()
 
+        var i = 0
         fun onIperfStdoutLine(line: String) {
             idleTaskKiller.updateTaskState()
-            val speed = try {
-                speedParser.parseSpeed(line)
-            } catch (e: IOException) {
-                onLog("Speed parser", "Invalid stdout format", e)
-                return
-            }
-
-            lock.withLock {
-                val results = measurementResults.results
-                if (speedEqualizer.accept(speed)) {
-                    for (i in 0 until measurementResults.results.size){
-                        if (speedEqualizer.accept(results[i].toLong())) {
-                            speedStatistics.accept(results[i].toLong())
-                            onSpeedUpdate(speedStatistics, results[i].toLong())
-                        }
-                    }
-                }
-            }
+            Log.i("i", i.toString())
+            i+=1
         }
 
         fun onIperfStderrLine(line: String) {
@@ -121,14 +108,12 @@ class StartUdpUploadIperfTask (
         }
 
         fun onIperfFinish() {
-            measurementResults.stop()
             thread.interrupt()
             onFinish()
         }
     }
 
-
     companion object {
-        const val LOG_TAG = "StartIperfTask"
+        const val LOG_TAG = "StartUdpUploadIperfTask"
     }
 }

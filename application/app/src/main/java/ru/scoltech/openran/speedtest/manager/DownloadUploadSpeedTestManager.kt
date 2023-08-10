@@ -2,6 +2,7 @@ package ru.scoltech.openran.speedtest.manager
 
 import android.content.Context
 import com.squareup.okhttp.HttpUrl
+import io.swagger.annotations.Api
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.MultithreadedIperfOutputParser
@@ -115,67 +116,103 @@ private constructor(
             )
             val stopServiceIperfTask = StopServiceIperfTask()
 
-
-            val startIperfTask = StartIperfTask(
-                context.filesDir.absolutePath,
-                "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
-                MultithreadedIperfOutputParser(),
-                SkipThenAverageEqualizer(
-                    DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
-                    DEFAULT_EQUALIZER_MAX_STORING
-                ),
-                DEFAULT_TIMEOUT.toLong(),
-                onStageSpeedUpdate,
-                { onStageFinish(stageConfiguration, it) },
-                onLog,
-            )
-            val startUdpUploadIperfTask = StartUdpUploadIperfTask(
-                context.filesDir.absolutePath,
-                "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
-                MultithreadedIperfOutputParser(),
-                SkipThenAverageEqualizer(
-                    DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
-                    DEFAULT_EQUALIZER_MAX_STORING
-                ),
-                DEFAULT_TIMEOUT.toLong(),
-                onStageSpeedUpdate,
-                onLog,
-            )
             val args = stageConfiguration.deviceArgs + stageConfiguration.serverArgs
-            if ( args.contains("-u") && !args.contains("-R")) {
-                mutableTaskConsumer = mutableTaskConsumer
-                    .withArgumentExtracted { it.iperfAddress }
-                    .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
-                    .andThenTry {
-                        initializeNewChain()
-                            .andThen(startServiceIperfTask)
-                            .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
-                            .withArgumentExtracted { it }
-                            .doTask(startUdpUploadIperfTask)
-                    }
-                    .andThenFinally(stopServiceIperfTask)
-                    .andThen(
-                        GetMeasurementResultsTask(
-                            startUdpUploadIperfTask.getStatistics(),
-                            { onStageFinish(stageConfiguration, it) },
-                        )
-                    )
-                    .andThen(DelayTask(idleBetweenTasksMelees))
+            if (args.contains("-u") && !args.contains("-R")) {
+                mutableTaskConsumer = makeTaskConsumerForUdpUpload(
+                    mutableTaskConsumer,
+                    immutableDeviceArgsPrefix,
+                    stageConfiguration,
+                    startServiceIperfTask,
+                    stopServiceIperfTask,
+                    idleBetweenTasksMelees
+                )
             } else {
-                mutableTaskConsumer = mutableTaskConsumer
-                    .withArgumentExtracted { it.iperfAddress }
-                    .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
-                    .andThenTry {
-                        initializeNewChain()
-                            .andThen(startServiceIperfTask)
-                            .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
-                            .withArgumentExtracted { it.iperfAddress }
-                            .doTask(startIperfTask)
-                    }
-                    .andThenFinally(stopServiceIperfTask)
-                    .andThen(DelayTask(idleBetweenTasksMelees))
+                mutableTaskConsumer = makeAverageTaskConsumer(
+                    mutableTaskConsumer,
+                    immutableDeviceArgsPrefix,
+                    stageConfiguration,
+                    startServiceIperfTask,
+                    stopServiceIperfTask,
+                    idleBetweenTasksMelees
+                )
             }
         }
+        return mutableTaskConsumer
+    }
+
+    private fun makeTaskConsumerForUdpUpload(
+        mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
+        immutableDeviceArgsPrefix: String,
+        stageConfiguration: StageConfiguration,
+        startServiceIperfTask: StartServiceIperfTask,
+        stopServiceIperfTask: StopServiceIperfTask,
+        idleBetweenTasksMelees: Long,
+    ): TaskConsumer<ApiClientHolder> {
+        mutableTaskConsumer
+            .withArgumentExtracted { it.iperfAddress }
+            .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+            .andThenTry {
+                initializeNewChain()
+                    .andThen(startServiceIperfTask)
+                    .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                    .andThen(
+                        StartUdpUploadIperfTask(
+                            context.filesDir.absolutePath,
+                            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+                            SkipThenAverageEqualizer(
+                                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                                DEFAULT_EQUALIZER_MAX_STORING
+                            ),
+                            DEFAULT_TIMEOUT.toLong(),
+                            onStageSpeedUpdate,
+                            onLog,
+                        )
+                    )
+            }
+            .andThenFinally(stopServiceIperfTask)
+            .andThen(
+                GetMeasurementResultsTask(
+                    { onStageFinish(stageConfiguration, it) },
+                )
+            )
+            .andThen(DelayTask(idleBetweenTasksMelees))
+        return mutableTaskConsumer
+    }
+
+    private fun makeAverageTaskConsumer(
+        mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
+        immutableDeviceArgsPrefix: String,
+        stageConfiguration: StageConfiguration,
+        startServiceIperfTask: StartServiceIperfTask,
+        stopServiceIperfTask: StopServiceIperfTask,
+        idleBetweenTasksMelees: Long,
+    ): TaskConsumer<ApiClientHolder> {
+        mutableTaskConsumer
+            .withArgumentExtracted { it.iperfAddress }
+            .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+            .andThenTry {
+                initializeNewChain()
+                    .andThen(startServiceIperfTask)
+                    .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                    .withArgumentExtracted { it.iperfAddress }
+                    .doTask(
+                        StartIperfTask(
+                            context.filesDir.absolutePath,
+                            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+                            MultithreadedIperfOutputParser(),
+                            SkipThenAverageEqualizer(
+                                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                                DEFAULT_EQUALIZER_MAX_STORING
+                            ),
+                            DEFAULT_TIMEOUT.toLong(),
+                            onStageSpeedUpdate,
+                            { onStageFinish(stageConfiguration, it) },
+                            onLog,
+                        )
+                    )
+            }
+            .andThenFinally(stopServiceIperfTask)
+            .andThen(DelayTask(idleBetweenTasksMelees))
         return mutableTaskConsumer
     }
 
