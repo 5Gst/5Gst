@@ -175,6 +175,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'EXCEPTION_HANDLER': 'services.utils.exception_handler.handle_exception',
 }
 
 DEFAULT_SWAGGER_TAG = os.getenv('DEFAULT_SWAGGER_TAG', 'balancer')
