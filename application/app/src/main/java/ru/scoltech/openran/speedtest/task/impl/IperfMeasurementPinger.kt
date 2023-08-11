@@ -4,6 +4,7 @@ import ru.scoltech.openran.speedtest.client.service.ApiException
 import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.Collectors
 
 class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
@@ -15,9 +16,9 @@ class IperfMeasurementPinger(
     override fun run() {
         while (true) {
             try {
-                val results =  apiClientHolder.serviceApiClient.iperfSpeedResults(fromFrame.toString()).results
+                val results =  apiClientHolder.serviceApiClient.getIperfSpeedProbes(fromFrame.get()).probes
                 fromFrame.set(fromFrame.get() + results.size)
-                saveMeasurement(results)
+                saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
                 Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 onLog(LOG_TAG, "thread interrupted while running $e", e)
