@@ -116,7 +116,7 @@ private constructor(
             val stopServiceIperfTask = StopServiceIperfTask()
 
             val args = stageConfiguration.deviceArgs + stageConfiguration.serverArgs
-            if (args.contains("\b-u\b") && !args.contains("\b-R\b")) {
+            if (args.contains("-u") && !args.contains("-R")) {
                 mutableTaskConsumer = makeTaskConsumerForUdpUpload(
                     mutableTaskConsumer,
                     immutableDeviceArgsPrefix,
