@@ -84,12 +84,12 @@ public class ServiceApiExample {
     public static void main(String[] args) {
         
         ServiceApi apiInstance = new ServiceApi();
-        String fromFrame = "fromFrame_example"; // String | 
+        Integer fromProbe = 56; // Integer | 
         try {
-            IperfSpeedResults result = apiInstance.iperfSpeedResults(fromFrame);
+            IperfMeasurement result = apiInstance.getIperfSpeedProbes(fromProbe);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling ServiceApi#iperfSpeedResults");
+            System.err.println("Exception when calling ServiceApi#getIperfSpeedProbes");
             e.printStackTrace();
         }
     }
@@ -103,17 +103,18 @@ All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ServiceApi* | [**iperfSpeedResults**](docs/ServiceApi.md#iperfSpeedResults) | **GET** /api/v1/measurement/results | 
-*ServiceApi* | [**startIperf**](docs/ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start | 
-*ServiceApi* | [**startSession**](docs/ServiceApi.md#startSession) | **POST** /api/v1/session/start | 
-*ServiceApi* | [**stopIperf**](docs/ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop | 
-*ServiceApi* | [**stopSession**](docs/ServiceApi.md#stopSession) | **POST** /api/v1/session/stop | 
+*ServiceApi* | [**getIperfSpeedProbes**](docs/ServiceApi.md#getIperfSpeedProbes) | **GET** /api/v1/measurement/results/ | 
+*ServiceApi* | [**startIperf**](docs/ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start/ | 
+*ServiceApi* | [**startSession**](docs/ServiceApi.md#startSession) | **POST** /api/v1/session/start/ | 
+*ServiceApi* | [**stopIperf**](docs/ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop/ | 
+*ServiceApi* | [**stopSession**](docs/ServiceApi.md#stopSession) | **POST** /api/v1/session/stop/ | 
 
 
 ## Documentation for Models
 
  - [IperfArgs](docs/IperfArgs.md)
- - [IperfSpeedResults](docs/IperfSpeedResults.md)
+ - [IperfMeasurement](docs/IperfMeasurement.md)
+ - [IperfSpeedProbe](docs/IperfSpeedProbe.md)
 
 
 ## Documentation for Authorization

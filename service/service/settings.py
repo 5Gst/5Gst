@@ -15,15 +15,11 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from drf_yasg import openapi
-from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.inspectors import SwaggerAutoSchema
 
 load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, 'subdir').
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -59,11 +55,9 @@ MIDDLEWARE = [
     'middleware.logger.FiveGstLoggerMiddleware'
 ]
 
-
 ROOT_URLCONF = 'service.urls'
 
 WSGI_APPLICATION = 'service.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -112,7 +106,12 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'EXCEPTION_HANDLER': 'apps.logic.utils.exception_handler.handle_exception',
 }
+
+from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.inspectors import SwaggerAutoSchema
 
 DEFAULT_SWAGGER_TAG = os.getenv('DEFAULT_SWAGGER_TAG', 'service')
 
@@ -130,6 +129,7 @@ class SpeedtestSwaggerAutoSchema(SwaggerAutoSchema):
             tags = [DEFAULT_SWAGGER_TAG]
 
         return tags
+
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': openapi.Info(

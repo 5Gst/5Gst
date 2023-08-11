@@ -4,20 +4,20 @@ All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**iperfSpeedResults**](ServiceApi.md#iperfSpeedResults) | **GET** /api/v1/measurement/results | 
-[**startIperf**](ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start | 
-[**startSession**](ServiceApi.md#startSession) | **POST** /api/v1/session/start | 
-[**stopIperf**](ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop | 
-[**stopSession**](ServiceApi.md#stopSession) | **POST** /api/v1/session/stop | 
+[**getIperfSpeedProbes**](ServiceApi.md#getIperfSpeedProbes) | **GET** /api/v1/measurement/results/ | 
+[**startIperf**](ServiceApi.md#startIperf) | **POST** /api/v1/iperf/start/ | 
+[**startSession**](ServiceApi.md#startSession) | **POST** /api/v1/session/start/ | 
+[**stopIperf**](ServiceApi.md#stopIperf) | **POST** /api/v1/iperf/stop/ | 
+[**stopSession**](ServiceApi.md#stopSession) | **POST** /api/v1/session/stop/ | 
 
 
-<a name="iperfSpeedResults"></a>
-# **iperfSpeedResults**
-> IperfSpeedResults iperfSpeedResults(fromFrame)
+<a name="getIperfSpeedProbes"></a>
+# **getIperfSpeedProbes**
+> IperfMeasurement getIperfSpeedProbes(fromProbe)
 
 
 
-Returns iperf speed results
+Returns iperf speed probes
 
 ### Example
 ```java
@@ -27,12 +27,12 @@ Returns iperf speed results
 
 
 ServiceApi apiInstance = new ServiceApi();
-String fromFrame = "fromFrame_example"; // String | 
+Integer fromProbe = 56; // Integer | 
 try {
-    IperfSpeedResults result = apiInstance.iperfSpeedResults(fromFrame);
+    IperfMeasurement result = apiInstance.getIperfSpeedProbes(fromProbe);
     System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling ServiceApi#iperfSpeedResults");
+    System.err.println("Exception when calling ServiceApi#getIperfSpeedProbes");
     e.printStackTrace();
 }
 ```
@@ -41,11 +41,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **fromFrame** | **String**|  | [optional]
+ **fromProbe** | **Integer**|  | [optional]
 
 ### Return type
 
-[**IperfSpeedResults**](IperfSpeedResults.md)
+[**IperfMeasurement**](IperfMeasurement.md)
 
 ### Authorization
 

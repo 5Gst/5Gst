@@ -25,36 +25,37 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import ru.scoltech.openran.speedtest.client.service.model.IperfSpeedProbe;
 
 /**
- * IperfSpeedResults
+ * IperfMeasurement
  */
 
-public class IperfSpeedResults {
-  @SerializedName("results")
-  private List<Integer> results = new ArrayList<>();
+public class IperfMeasurement {
+  @SerializedName("probes")
+  private List<IperfSpeedProbe> probes = new ArrayList<>();
 
-  public IperfSpeedResults results(List<Integer> results) {
-    this.results = results;
+  public IperfMeasurement probes(List<IperfSpeedProbe> probes) {
+    this.probes = probes;
     return this;
   }
 
-  public IperfSpeedResults addResultsItem(Integer resultsItem) {
-    this.results.add(resultsItem);
+  public IperfMeasurement addProbesItem(IperfSpeedProbe probesItem) {
+    this.probes.add(probesItem);
     return this;
   }
 
    /**
-   * Get results
-   * @return results
+   * Get probes
+   * @return probes
   **/
   @ApiModelProperty(required = true, value = "")
-  public List<Integer> getResults() {
-    return results;
+  public List<IperfSpeedProbe> getProbes() {
+    return probes;
   }
 
-  public void setResults(List<Integer> results) {
-    this.results = results;
+  public void setProbes(List<IperfSpeedProbe> probes) {
+    this.probes = probes;
   }
 
 
@@ -66,22 +67,22 @@ public class IperfSpeedResults {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IperfSpeedResults iperfSpeedResults = (IperfSpeedResults) o;
-    return Objects.equals(this.results, iperfSpeedResults.results);
+    IperfMeasurement iperfMeasurement = (IperfMeasurement) o;
+    return Objects.equals(this.probes, iperfMeasurement.probes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(results);
+    return Objects.hash(probes);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IperfSpeedResults {\n");
+    sb.append("class IperfMeasurement {\n");
     
-    sb.append("    results: ").append(toIndentedString(results)).append("\n");
+    sb.append("    probes: ").append(toIndentedString(probes)).append("\n");
     sb.append("}");
     return sb.toString();
   }
