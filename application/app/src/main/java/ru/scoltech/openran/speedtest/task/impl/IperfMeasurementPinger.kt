@@ -19,7 +19,7 @@ class IperfMeasurementPinger(
                 val results =  apiClientHolder.serviceApiClient.getIperfSpeedProbes(fromFrame.get()).probes
                 fromFrame.set(fromFrame.get() + results.size)
                 saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
-                Thread.sleep(1000)
+                Thread.sleep(100)
             } catch (e: InterruptedException) {
                 onLog(LOG_TAG, "thread interrupted while running $e", e)
                 return
