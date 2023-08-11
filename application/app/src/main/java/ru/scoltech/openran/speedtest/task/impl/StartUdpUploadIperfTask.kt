@@ -36,6 +36,7 @@ class StartUdpUploadIperfTask(
         val idleTaskKiller = IdleTaskKiller()
         val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
             for (el in data) {
+                Log.i("results", el.toString())
                 if (speedEqualizer.accept(el.toLong())) {
                     speedStatistics.accept(el.toLong())
                     val equalizedSpeed = try {
@@ -97,7 +98,7 @@ class StartUdpUploadIperfTask(
 
         fun onIperfStdoutLine(line: String) {
             idleTaskKiller.updateTaskState()
-            onLog("iPerf stdout", line, null)
+            //onLog("iPerf stdout", line, null)
         }
 
         fun onIperfStderrLine(line: String) {
