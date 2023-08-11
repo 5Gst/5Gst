@@ -29,23 +29,25 @@ class StartUdpUploadIperfTask(
     private val onLog: (String, String, Exception?) -> Unit,
 ) : Task<ApiClientHolder, ApiClientHolder> {
     private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
+    private val lock = ReentrantLock()
     override fun prepare(
         argument: ApiClientHolder,
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
         val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
-            for (el in data) {
-                Log.i("results", el.toString())
-                if (speedEqualizer.accept(el.toLong())) {
-                    speedStatistics.accept(el.toLong())
-                    val equalizedSpeed = try {
-                        speedEqualizer.getEqualized()
-                    } catch (e: Equalizer.NoValueException) {
-                        onLog(LOG_TAG, "Equalizer $e", e)
-                        return@IperfMeasurementPinger
+            lock.withLock {
+                for (el in data) {
+                    if (speedEqualizer.accept(el.toLong())) {
+                        speedStatistics.accept(el.toLong())
+                        val equalizedSpeed = try {
+                            speedEqualizer.getEqualized()
+                        } catch (e: Equalizer.NoValueException) {
+                            onLog(LOG_TAG, "Equalizer $e", e)
+                            return@IperfMeasurementPinger
+                        }
+                        onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
                     }
-                    onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
                 }
             }
         }
@@ -98,7 +100,7 @@ class StartUdpUploadIperfTask(
 
         fun onIperfStdoutLine(line: String) {
             idleTaskKiller.updateTaskState()
-            //onLog("iPerf stdout", line, null)
+            onLog("iPerf stdout", line, null)
         }
 
         fun onIperfStderrLine(line: String) {
