@@ -40,7 +40,6 @@ class StartUdpUploadIperfTask(
         val idleTaskKiller = IdleTaskKiller()
         val measurementPinger = IperfMeasurementPinger(argument, onLog,onConnectionWait, delayBetweenPing) { data ->
             lock.withLock {
-                Log.i("data", data.toString())
                 onConnectionWait(false)
                 for (el in data) {
                     if (speedEqualizer.accept(el.toLong())) {
