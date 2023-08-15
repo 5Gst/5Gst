@@ -11,18 +11,20 @@ class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
     private val onLog: (String, String, Exception?) -> Unit,
     private val onConnectionWait: (Boolean) -> Unit,
+    private val delayBetweenPing: Long,
     private val saveMeasurement: (List<Int>) -> Unit
 ) : Runnable {
 
     private val fromFrame = AtomicInteger(0)
     override fun run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted) {
             try {
                 val results =  apiClientHolder.serviceApiClient.getIperfSpeedProbes(fromFrame.get()).probes
                 fromFrame.set(fromFrame.get() + results.size)
-                onConnectionWait(false)
-                saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
-                Thread.sleep(100)
+                if (results.size!=0) {
+                    saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
+                }
+                Thread.sleep(delayBetweenPing)
             } catch (e: InterruptedException) {
                 onLog(LOG_TAG, "thread interrupted while running $e", e)
                 return

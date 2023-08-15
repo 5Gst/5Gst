@@ -28,6 +28,8 @@ class StartUdpUploadIperfTask(
     private val onSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
     private val onConnectionWait: (Boolean) -> Unit,
+    private val delayBetweenPing: Long,
+    private val delayBeforeStartIperf: Long,
 ) : Task<ApiClientHolder, ApiClientHolder> {
     private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
     private val lock = ReentrantLock()
@@ -36,24 +38,26 @@ class StartUdpUploadIperfTask(
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
-        val measurementPinger = IperfMeasurementPinger(argument, onLog,onConnectionWait) { data ->
+        val measurementPinger = IperfMeasurementPinger(argument, onLog,onConnectionWait, delayBetweenPing) { data ->
             lock.withLock {
+                Log.i("data", data.toString())
+                onConnectionWait(false)
                 for (el in data) {
                     if (speedEqualizer.accept(el.toLong())) {
                         speedStatistics.accept(el.toLong())
-                        val equalizedSpeed = try {
-                            speedEqualizer.getEqualized()
-                        } catch (e: Equalizer.NoValueException) {
-                            onLog(LOG_TAG, "Equalizer $e", e)
-                            return@IperfMeasurementPinger
-                        }
-                        onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
                     }
                 }
+                val equalizedSpeed = try {
+                    speedEqualizer.getEqualized()
+                } catch (e: Equalizer.NoValueException) {
+                    onLog(LOG_TAG, "Equalizer $e", e)
+                    return@IperfMeasurementPinger
+                }
+                onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
             }
         }
         val thread = Thread(measurementPinger)
-        val processor = IperfOutputProcessor(idleTaskKiller, thread,measurementPinger) {
+        val processor = IperfOutputProcessor(idleTaskKiller, thread) {
             onSuccess?.invoke(argument)
         }
 
@@ -64,12 +68,12 @@ class StartUdpUploadIperfTask(
             .build()
 
 
+        thread.start()
+        onConnectionWait(true)
+        Thread.sleep(delayBeforeStartIperf)
+
         while (true) {
             try {
-
-                thread.start()
-                onConnectionWait(true)
-                Thread.sleep(1000)
 
                 // TODO validate not to have -c and -p in command
                 iperfRunner.start(
@@ -79,7 +83,6 @@ class StartUdpUploadIperfTask(
                 val task = {
                     try {
                         iperfRunner.sendSigKill()
-                        thread.interrupt()
                     } catch (e: IperfException) {
                         onLog(LOG_TAG, "Could not stop iPerf", e)
                     }
@@ -98,7 +101,6 @@ class StartUdpUploadIperfTask(
     private inner class IperfOutputProcessor(
         private val idleTaskKiller: IdleTaskKiller,
         private val thread: Thread,
-        private val measurementPinger: IperfMeasurementPinger,
         private val onFinish: () -> Unit,
     ) {
 
