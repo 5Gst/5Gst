@@ -158,6 +158,7 @@ private constructor(
             DEFAULT_TIMEOUT.toLong(),
             onStageSpeedUpdate,
             onLog,
+            onConnectionWait,
         )
         mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
