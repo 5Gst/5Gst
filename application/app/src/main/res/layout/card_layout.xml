@@ -29,6 +29,7 @@
             android:text="Ожидаем результатов"
             android:textAppearance="@style/Headline2"
             android:textColor="@color/colorLightBackground"
+            android:visibility="invisible"
             app:layout_constraintLeft_toLeftOf="@+id/speed_info"
             app:layout_constraintRight_toRightOf="@+id/speed_info"
             app:layout_constraintTop_toTopOf="parent"

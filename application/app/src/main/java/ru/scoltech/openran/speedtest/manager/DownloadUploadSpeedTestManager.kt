@@ -266,7 +266,7 @@ private constructor(
         private var onStop: Runnable = Runnable {}
         private var onLog: (String, String, Exception?) -> Unit = { _, _, _ -> }
         private var onFatalError: BiConsumer<String, Exception?> = BiConsumer { _, _ -> }
-        private var onConnectionWait: (Boolean) -> Unit = {_, ->}
+        private var onConnectionWait: Consumer<Boolean> = Consumer{}
 
         fun build(): DownloadUploadSpeedTestManager {
             return DownloadUploadSpeedTestManager(
@@ -279,7 +279,7 @@ private constructor(
                 onStop::run,
                 onLog::invoke,
                 onFatalError::accept,
-                onConnectionWait::invoke,
+                onConnectionWait::accept,
             )
         }
 
@@ -323,7 +323,7 @@ private constructor(
             return this
         }
 
-        fun onConnectionWait( onConnectionWait: (Boolean) -> Unit): Builder {
+        fun onConnectionWait( onConnectionWait: Consumer<Boolean>): Builder {
             this.onConnectionWait = onConnectionWait
             return this
         }
