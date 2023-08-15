@@ -27,6 +27,7 @@ private constructor(
     private val onStop: () -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
     private val onFatalError: (String, Exception?) -> Unit,
+    private val onConnectionWait: (Boolean) -> Unit,
 ) {
     private val lock = ReentrantLock()
     private var taskChain: TaskChain<*>? = null
@@ -264,6 +265,7 @@ private constructor(
         private var onStop: Runnable = Runnable {}
         private var onLog: (String, String, Exception?) -> Unit = { _, _, _ -> }
         private var onFatalError: BiConsumer<String, Exception?> = BiConsumer { _, _ -> }
+        private var onConnectionWait: (Boolean) -> Unit = {_, ->}
 
         fun build(): DownloadUploadSpeedTestManager {
             return DownloadUploadSpeedTestManager(
@@ -276,6 +278,7 @@ private constructor(
                 onStop::run,
                 onLog::invoke,
                 onFatalError::accept,
+                onConnectionWait::invoke,
             )
         }
 
@@ -316,6 +319,11 @@ private constructor(
 
         fun onFatalError(onFatalError: BiConsumer<String, Exception?>): Builder {
             this.onFatalError = onFatalError
+            return this
+        }
+
+        fun onConnectionWait( onConnectionWait: (Boolean) -> Unit): Builder {
+            this.onConnectionWait = onConnectionWait
             return this
         }
     }

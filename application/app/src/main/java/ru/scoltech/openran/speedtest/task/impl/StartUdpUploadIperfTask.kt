@@ -27,6 +27,7 @@ class StartUdpUploadIperfTask(
     private val idleTimeoutMillis: Long,
     private val onSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
+    private val onConnectionWait: (Boolean) -> Unit,
 ) : Task<ApiClientHolder, ApiClientHolder> {
     private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
     private val lock = ReentrantLock()
@@ -35,7 +36,7 @@ class StartUdpUploadIperfTask(
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
-        val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
+        val measurementPinger = IperfMeasurementPinger(argument, onLog, onConnectionWait) { data ->
             lock.withLock {
                 for (el in data) {
                     if (speedEqualizer.accept(el.toLong())) {
@@ -67,6 +68,8 @@ class StartUdpUploadIperfTask(
             try {
 
                 thread.start()
+                onConnectionWait(true)
+                Thread.sleep(1000)
 
                 // TODO validate not to have -c and -p in command
                 iperfRunner.start(

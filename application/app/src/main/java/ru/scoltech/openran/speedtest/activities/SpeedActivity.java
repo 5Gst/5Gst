@@ -123,6 +123,10 @@ public class SpeedActivity extends AppCompatActivity {
 
                     return Unit.INSTANCE;
                 })
+                .onConnectionWait( visible -> {
+                    mCard.waitConnection(visible);
+                    return Unit.INSTANCE;
+                })
                 .build();
 
         onPlayUI();

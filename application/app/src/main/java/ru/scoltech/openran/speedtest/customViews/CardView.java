@@ -13,6 +13,7 @@ public class CardView extends LinearLayout {
 
     private TextView integerSpeedTV;
     private TextView fractionSpeedTV;
+    private TextView waitingMessage;
     private TextView pingTV;
 
     private TextView dotCaption;
@@ -36,6 +37,7 @@ public class CardView extends LinearLayout {
     private void init() {
         integerSpeedTV = findViewById(R.id.integer_speed);
         fractionSpeedTV = findViewById(R.id.fraction_speed);
+        waitingMessage = findViewById(R.id.waiting_message);
 
         pingTV = findViewById(R.id.value_ping);
 
@@ -117,5 +119,22 @@ public class CardView extends LinearLayout {
 
     public Wave getWave() {
         return mWave;
+    }
+
+    public void waitConnection(Boolean waiting){
+        if (waiting){
+            waitingMessage.setVisibility(VISIBLE);
+            integerSpeedTV.setVisibility(INVISIBLE);
+            dotCaption.setVisibility(INVISIBLE);
+            fractionSpeedTV.setVisibility(INVISIBLE);
+            mbpsCaption.setVisibility(INVISIBLE);
+        }
+        else{
+            waitingMessage.setVisibility(INVISIBLE);
+            integerSpeedTV.setVisibility(VISIBLE);
+            dotCaption.setVisibility(VISIBLE);
+            fractionSpeedTV.setVisibility(VISIBLE);
+            mbpsCaption.setVisibility(VISIBLE);
+        }
     }
 }

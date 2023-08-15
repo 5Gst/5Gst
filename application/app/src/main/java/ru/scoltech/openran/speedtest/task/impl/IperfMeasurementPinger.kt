@@ -9,6 +9,7 @@ import java.util.stream.Collectors
 class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
     private val onLog: (String, String, Exception?) -> Unit,
+    private val onConnectionWait: (Boolean) -> Unit,
     private val saveMeasurement: (List<Int>) -> Unit
 ) : Runnable {
 
@@ -18,6 +19,7 @@ class IperfMeasurementPinger(
             try {
                 val results =  apiClientHolder.serviceApiClient.getIperfSpeedProbes(fromFrame.get()).probes
                 fromFrame.set(fromFrame.get() + results.size)
+                onConnectionWait(false)
                 saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
                 Thread.sleep(100)
             } catch (e: InterruptedException) {
