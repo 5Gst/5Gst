@@ -10,17 +10,17 @@ import java.util.stream.Collectors
 class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
     private val onLog: (String, String, Exception?) -> Unit,
+    private val onConnectionWait: (Boolean) -> Unit,
     private val saveMeasurement: (List<Int>) -> Unit
 ) : Runnable {
 
-    private var waiting = AtomicBoolean(true)
     private val fromFrame = AtomicInteger(0)
     override fun run() {
         while (true) {
             try {
                 val results =  apiClientHolder.serviceApiClient.getIperfSpeedProbes(fromFrame.get()).probes
                 fromFrame.set(fromFrame.get() + results.size)
-                waiting.set(false)
+                onConnectionWait(false)
                 saveMeasurement(results.stream().map { el -> el.bitsPerSecond }.collect(Collectors.toList()))
                 Thread.sleep(100)
             } catch (e: InterruptedException) {
@@ -32,11 +32,6 @@ class IperfMeasurementPinger(
             }
         }
     }
-
-    public fun isConnecting() : Boolean{
-        return waiting.get()
-    }
-
     companion object {
         const val LOG_TAG = "IperfMeasurementPinger"
     }

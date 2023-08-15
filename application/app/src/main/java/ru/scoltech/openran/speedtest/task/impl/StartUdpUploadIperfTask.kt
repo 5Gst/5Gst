@@ -36,7 +36,7 @@ class StartUdpUploadIperfTask(
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
-        val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
+        val measurementPinger = IperfMeasurementPinger(argument, onLog,onConnectionWait) { data ->
             lock.withLock {
                 for (el in data) {
                     if (speedEqualizer.accept(el.toLong())) {
@@ -105,9 +105,6 @@ class StartUdpUploadIperfTask(
         fun onIperfStdoutLine(line: String) {
             idleTaskKiller.updateTaskState()
             onLog("iPerf stdout", line, null)
-
-
-            onConnectionWait(measurementPinger.isConnecting())
         }
 
         fun onIperfStderrLine(line: String) {
