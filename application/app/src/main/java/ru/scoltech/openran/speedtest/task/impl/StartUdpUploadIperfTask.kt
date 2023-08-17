@@ -28,8 +28,6 @@ class StartUdpUploadIperfTask(
     private val onSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
     private val onConnectionWait: (Boolean) -> Unit,
-    private val delayBetweenPing: Long,
-    private val delayBeforeStartIperf: Long,
 ) : Task<ApiClientHolder, ApiClientHolder> {
     private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
     private val lock = ReentrantLock()
@@ -38,7 +36,7 @@ class StartUdpUploadIperfTask(
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
         val idleTaskKiller = IdleTaskKiller()
-        val measurementPinger = IperfMeasurementPinger(argument, onLog,onConnectionWait, delayBetweenPing) { data ->
+        val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
             lock.withLock {
                 onConnectionWait(false)
                 for (el in data) {
@@ -49,7 +47,7 @@ class StartUdpUploadIperfTask(
                 val equalizedSpeed = try {
                     speedEqualizer.getEqualized()
                 } catch (e: Equalizer.NoValueException) {
-                    onLog(LOG_TAG, "Equalizer $e", e)
+                    onLog(LOG_TAG, "Wrong value pass to equalizer", e)
                     return@IperfMeasurementPinger
                 }
                 onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
@@ -69,7 +67,6 @@ class StartUdpUploadIperfTask(
 
         thread.start()
         onConnectionWait(true)
-        Thread.sleep(delayBeforeStartIperf)
 
         while (true) {
             try {

@@ -10,12 +10,11 @@ import java.util.stream.Collectors
 class IperfMeasurementPinger(
     private val apiClientHolder: ApiClientHolder,
     private val onLog: (String, String, Exception?) -> Unit,
-    private val onConnectionWait: (Boolean) -> Unit,
-    private val delayBetweenPing: Long,
     private val saveMeasurement: (List<Int>) -> Unit
 ) : Runnable {
 
     private val fromFrame = AtomicInteger(0)
+    private val delayBetweenPing: Long = 100
     override fun run() {
         while (!Thread.currentThread().isInterrupted) {
             try {
@@ -26,10 +25,10 @@ class IperfMeasurementPinger(
                 }
                 Thread.sleep(delayBetweenPing)
             } catch (e: InterruptedException) {
-                onLog(LOG_TAG, "thread interrupted while running $e", e)
+                onLog(LOG_TAG, "thread interrupted while running", e)
                 return
             } catch (e: ApiException){
-                onLog(LOG_TAG, "ApiException (mb caused by interrupting thread) $e", e)
+                onLog(LOG_TAG, "ApiException (mb caused by interrupting thread)", e)
                 return
             }
         }

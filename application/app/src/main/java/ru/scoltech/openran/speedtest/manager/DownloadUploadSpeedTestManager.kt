@@ -159,8 +159,6 @@ private constructor(
             onStageSpeedUpdate,
             onLog,
             onConnectionWait,
-            context.getString(R.string.delay_between_ping).toLong(),
-            context.getString(R.string.delay_before_start_iperf).toLong(),
         )
         mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
