@@ -111,6 +111,7 @@ class StartUdpUploadIperfTask(
         }
 
         fun onIperfFinish() {
+            onConnectionWait(false)
             thread.interrupt()
             onFinish()
         }
