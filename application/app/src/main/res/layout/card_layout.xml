@@ -99,7 +99,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ru.scoltech.openran.speedtest.Wave
+    <ru.fivegst.speedtest.Wave
         android:id="@+id/progress_wave"
         android:layout_width="match_parent"
         android:layout_height="100dp"

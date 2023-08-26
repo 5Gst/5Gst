@@ -3,8 +3,8 @@ import java.nio.file.Files
 
 buildscript {
     ext {
-        versionCode = 5
-        versionName = "0.6.0"
+        versionCode = 6
+        versionName = "0.7.0"
     }
 }
 
@@ -36,7 +36,7 @@ android {
     ndkVersion '25.0.8775105'
 
     defaultConfig {
-        applicationId "ru.scoltech.openran.speedtest"
+        applicationId "ru.fivegst.speedtest"
         minSdkVersion 24
         targetSdkVersion 32
         versionCode project.ext.versionCode

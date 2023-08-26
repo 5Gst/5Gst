@@ -71,10 +71,10 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import ru.scoltech.openran.speedtest.client.balancer.*;
-import ru.scoltech.openran.speedtest.client.balancer.auth.*;
-import ru.scoltech.openran.speedtest.client.balancer.model.*;
-import ru.scoltech.openran.speedtest.client.balancer.api.BalancerApi;
+import ru.fivegst.speedtest.client.balancer.*;
+import ru.fivegst.speedtest.client.balancer.auth.*;
+import ru.fivegst.speedtest.client.balancer.model.*;
+import ru.fivegst.speedtest.client.balancer.api.BalancerApi;
 
 import java.io.File;
 import java.util.*;

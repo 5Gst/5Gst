@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.scoltech.openran.speedtest.activities.StartActivity">
+    tools:context="ru.fivegst.speedtest.activities.StartActivity">
 
 
     <LinearLayout
@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
 
-        <ru.scoltech.openran.speedtest.customViews.HeaderView
+        <ru.fivegst.speedtest.customViews.HeaderView
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -193,7 +193,7 @@
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="7dp">
 
-                <ru.scoltech.openran.speedtest.customButtons.ActionButton
+                <ru.fivegst.speedtest.customButtons.ActionButton
                     android:id="@+id/action_btn"
                     style="?android:attr/buttonBarButtonStyle"
 

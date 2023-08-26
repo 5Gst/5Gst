@@ -1,0 +1,13 @@
+package ru.fivegst.speedtest.domain
+
+import java.util.*
+
+data class SpeedTestResultOld(
+    val uploadSpeed: Long,
+    val downloadSpeed: Long,
+    val ping: Long,
+    val creationTime: Date,
+    val serverAddress: String,
+    val description: String,
+    val id: Long = 0,
+)

@@ -71,10 +71,10 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import ru.scoltech.openran.speedtest.client.service.*;
-import ru.scoltech.openran.speedtest.client.service.auth.*;
-import ru.scoltech.openran.speedtest.client.service.model.*;
-import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+import ru.fivegst.speedtest.client.service.*;
+import ru.fivegst.speedtest.client.service.auth.*;
+import ru.fivegst.speedtest.client.service.model.*;
+import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 import java.io.File;
 import java.util.*;

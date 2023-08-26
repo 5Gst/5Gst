@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.scoltech.openran.speedtest.activities.StartActivity">
+    tools:context="ru.fivegst.speedtest.activities.StartActivity">
 
 
     <LinearLayout
@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
 
-        <ru.scoltech.openran.speedtest.customViews.HeaderView
+        <ru.fivegst.speedtest.customViews.HeaderView
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
             app:is_active_button_group="true"
             app:section_name="5G Speedtest" />
 
-        <ru.scoltech.openran.speedtest.customViews.CardView
+        <ru.fivegst.speedtest.customViews.CardView
             android:id="@+id/card"
 
             android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
 
             android:visibility="visible" />
 
-        <ru.scoltech.openran.speedtest.customViews.ResultView
+        <ru.fivegst.speedtest.customViews.ResultView
             android:id="@+id/result"
 
             android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
             android:layout_marginEnd="20dp"
             android:visibility="gone" />
 
-        <ru.scoltech.openran.speedtest.customViews.SubResultView
+        <ru.fivegst.speedtest.customViews.SubResultView
             android:id="@+id/subresult"
 
             android:layout_width="match_parent"
@@ -65,7 +65,7 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ru.scoltech.openran.speedtest.customButtons.SaveButton
+            <ru.fivegst.speedtest.customButtons.SaveButton
                 android:id="@+id/save_btn"
                 style="?android:attr/buttonBarButtonStyle"
 
@@ -77,7 +77,7 @@
 
                 android:visibility="visible" />
 
-            <ru.scoltech.openran.speedtest.customButtons.ActionButton
+            <ru.fivegst.speedtest.customButtons.ActionButton
                 android:id="@+id/action_btn"
                 style="?android:attr/buttonBarButtonStyle"
 
@@ -94,7 +94,7 @@
 
                 android:onClick="onClick" />
 
-            <ru.scoltech.openran.speedtest.customButtons.ShareButton
+            <ru.fivegst.speedtest.customButtons.ShareButton
                 android:id="@+id/share_btn"
                 style="?android:attr/buttonBarButtonStyle"
 
