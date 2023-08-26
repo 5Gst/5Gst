@@ -224,10 +224,20 @@ class NetworkInfoTab : Fragment() {
 
         val identity = cellInfo.cellIdentity
         appendMeasurementToConsole("mcc") {
-            identity.mcc.takeIfAvbailable()?.toString()
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                @Suppress("DEPRECATION")
+                identity.mcc.takeIfAvbailable()?.toString()
+            } else {
+                identity.mccString
+            }
         }
         appendMeasurementToConsole("mnc") {
-            identity.mnc.takeIfAvbailable()?.toString()
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                @Suppress("DEPRECATION")
+                identity.mnc.takeIfAvbailable()?.toString()
+            } else {
+                identity.mncString
+            }
         }
 
         val signalStrength = cellInfo.cellSignalStrength
