@@ -30,7 +30,7 @@ class ShareButton(context: Context, attrs: AttributeSet?) : AppCompatButton(cont
             intent.type = "image/png"
 
             val picFile = externalDir.resolve("__share_tmp.png")
-            val bitmap = _root_ide_package_.ru.fivegst.speedtest.SpeedManager.getInstance().generateImage(activity)
+            val bitmap = SpeedManager.getInstance().generateImage(activity)
             ExternalStorageSaver(activity).save(picFile, bitmap)
             val uri = FileProvider.getUriForFile(
                 activity,

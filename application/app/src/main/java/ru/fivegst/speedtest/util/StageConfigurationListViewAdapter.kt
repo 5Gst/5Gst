@@ -34,24 +34,20 @@ class StageConfigurationListViewAdapter(
 
         stageNameView.addTextChangedListener {
             data[position] = data[position].copy(name = stageNameView.text.toString())
-            _root_ide_package_.ru.fivegst.speedtest.parser.StageConfigurationParser()
-                .saveStageToPrefs(context, data)
+            StageConfigurationParser().saveStageToPrefs(context, data)
         }
         deviceArgsView.addTextChangedListener {
             data[position] = data[position].copy(deviceArgs = deviceArgsView.text.toString())
-            _root_ide_package_.ru.fivegst.speedtest.parser.StageConfigurationParser()
-                .saveStageToPrefs(context, data)
+            StageConfigurationParser().saveStageToPrefs(context, data)
         }
         serviceArgsView.addTextChangedListener {
             data[position] = data[position].copy(serverArgs = serviceArgsView.text.toString())
-            _root_ide_package_.ru.fivegst.speedtest.parser.StageConfigurationParser()
-                .saveStageToPrefs(context, data)
+            StageConfigurationParser().saveStageToPrefs(context, data)
         }
 
         deleteButtonView.setOnClickListener {
             data.removeAt(position);
-            _root_ide_package_.ru.fivegst.speedtest.parser.StageConfigurationParser()
-                .saveStageToPrefs(context, data)
+            StageConfigurationParser().saveStageToPrefs(context, data)
             this.notifyDataSetChanged()
         };
 

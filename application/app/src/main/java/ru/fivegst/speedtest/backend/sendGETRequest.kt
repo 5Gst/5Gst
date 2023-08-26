@@ -20,7 +20,7 @@ suspend fun sendGETRequest(
     value: String = ""
 ): String {
     val currentSocketAddress: InetSocketAddress = try {
-        parseInetSocketAddress(address, _root_ide_package_.ru.fivegst.speedtest.ApplicationConstants.DEFAULT_HTTP_SERVER_PORT)
+        parseInetSocketAddress(address, ApplicationConstants.DEFAULT_HTTP_SERVER_PORT)
     } catch (e: UnknownHostException) {
         Log.e("sendGETRequest", "Could not parse address", e)
         return "error"

@@ -18,7 +18,7 @@ class OptionsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_options)
 
-        val header = findViewById<_root_ide_package_.ru.fivegst.speedtest.customViews.HeaderView>(R.id.option_header)
+        val header = findViewById<HeaderView>(R.id.option_header)
         header.hideOptionsButton()
 
         val viewPager: ViewPager2 = findViewById(R.id.view_pager)

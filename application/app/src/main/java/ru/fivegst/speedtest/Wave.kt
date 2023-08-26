@@ -23,12 +23,10 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         }
     }
 
-    private val topBackgroundHarmonics = _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum()
-    private val bottomBackgroundHarmonics =
-        _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum()
-    private val topForegroundHarmonics = _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum()
-    private val bottomForegroundHarmonics =
-        _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum()
+    private val topBackgroundHarmonics = HarmonicSum()
+    private val bottomBackgroundHarmonics = HarmonicSum()
+    private val topForegroundHarmonics = HarmonicSum()
+    private val bottomForegroundHarmonics = HarmonicSum()
 
     init {
         paint.strokeWidth = 1f
@@ -40,7 +38,7 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         stop()
         redrawJob = CoroutineScope(Dispatchers.Default).launch {
             while (true) {
-                delay(1000 / _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FPS)
+                delay(1000 / FPS)
                 this@Wave.postInvalidate()
             }
         }
@@ -56,7 +54,7 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     private inline fun buildFunctionPath(path: Path = Path(), f: (Float) -> Float): Path {
-        val points = (0..width).map { it.toFloat() to f(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_X * it.toFloat() / width) }
+        val points = (0..width).map { it.toFloat() to f(MAX_X * it.toFloat() / width) }
 
         if (path.isEmpty) {
             path.moveTo(points[0].first, points[0].second)
@@ -65,7 +63,7 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         return path
     }
 
-    private fun drawHarmonics(canvas: Canvas, alpha: Int, top: _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum, bottom: _root_ide_package_.ru.fivegst.speedtest.Wave.HarmonicSum) {
+    private fun drawHarmonics(canvas: Canvas, alpha: Int, top: HarmonicSum, bottom: HarmonicSum) {
         paint.alpha = alpha
         top.update(normalizedSpeed)
         bottom.update(normalizedSpeed)
@@ -75,14 +73,12 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     public override fun onDraw(canvas: Canvas) {
-        drawHarmonics(canvas,
-            _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.BACKGROUND_ALPHA, topBackgroundHarmonics, bottomBackgroundHarmonics)
-        drawHarmonics(canvas,
-            _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FOREGROUND_ALPHA, topForegroundHarmonics, bottomForegroundHarmonics)
+        drawHarmonics(canvas, BACKGROUND_ALPHA, topBackgroundHarmonics, bottomBackgroundHarmonics)
+        drawHarmonics(canvas, FOREGROUND_ALPHA, topForegroundHarmonics, bottomForegroundHarmonics)
     }
 
     fun attachSpeed(speed: Int) {
-        normalizedSpeed = log2(speed.toFloat() + 1) * _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.NORMALIZED_SPEED_SCALE
+        normalizedSpeed = log2(speed.toFloat() + 1) * NORMALIZED_SPEED_SCALE
     }
 
     fun attachColor(color: Int) {
@@ -96,10 +92,10 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         var amplitudeCyclicScale: Float = 0f,
     ): (Float) -> Float {
         val amplitudeScale: Float
-            get() = amplitudeCyclicScale.mod(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_AMPLITUDE_SCALE * 4)
-                .minus(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_AMPLITUDE_SCALE * 2)
+            get() = amplitudeCyclicScale.mod(MAX_AMPLITUDE_SCALE * 4)
+                .minus(MAX_AMPLITUDE_SCALE * 2)
                 .absoluteValue
-                .minus(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_AMPLITUDE_SCALE)
+                .minus(MAX_AMPLITUDE_SCALE)
 
         override fun invoke(p1: Float): Float {
             return amplitudeScale * amplitude * sin(frequency * p1 + initialPhase)
@@ -107,32 +103,32 @@ class Wave(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     private class HarmonicSum : (Float) -> Float {
-        private val harmonics = _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FREQUENCIES.map { frequency ->
-            _root_ide_package_.ru.fivegst.speedtest.Wave.Harmonic(
-                _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_AMPLITUDE,
+        private val harmonics = FREQUENCIES.map { frequency ->
+            Harmonic(
+                MAX_AMPLITUDE,
                 frequency,
-                Random.nextFloat() * _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_STARTING_INITIAL_PHASE,
-                Random.nextFloat() * _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_AMPLITUDE_SCALE * 4
+                Random.nextFloat() * MAX_STARTING_INITIAL_PHASE,
+                Random.nextFloat() * MAX_AMPLITUDE_SCALE * 4
             )
         }
 
         override fun invoke(p1: Float): Float {
             return harmonics.sumOf {
-                it(p1).toDouble() + it.amplitude * _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.OFFSET_AMPLITUDE_SCALE
+                it(p1).toDouble() + it.amplitude * OFFSET_AMPLITUDE_SCALE
             }.toFloat()
         }
 
         fun update(normalizedSpeed: Float) {
             harmonics.forEachIndexed { index, harmonic ->
-                harmonic.amplitudeCyclicScale += _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.AMPLITUDE_CYCLIC_SCALE_STEP
-                    .times(normalizedSpeed + _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.AMPLITUDE_CYCLIC_SCALE_STEP_MIN_SCALE)
-                if (abs(harmonic.amplitudeScale) < _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MUTATION_AMPLITUDE_SCALE_THRESHOLD) {
+                harmonic.amplitudeCyclicScale += AMPLITUDE_CYCLIC_SCALE_STEP
+                    .times(normalizedSpeed + AMPLITUDE_CYCLIC_SCALE_STEP_MIN_SCALE)
+                if (abs(harmonic.amplitudeScale) < MUTATION_AMPLITUDE_SCALE_THRESHOLD) {
                     harmonic.initialPhase += Random.nextFloat()
-                        .times(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.MAX_INITIAL_PHASE_STEP)
+                        .times(MAX_INITIAL_PHASE_STEP)
                         .times(if (index % 2 == 0) -1 else 1)
-                    harmonic.frequency = _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FREQUENCIES[index]
-                        .plus(Random.nextFloat() * _root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FREQUENCY_SEGMENT_LENGTH)
-                        .minus(_root_ide_package_.ru.fivegst.speedtest.Wave.Companion.FREQUENCY_SEGMENT_LENGTH / 2)
+                    harmonic.frequency = FREQUENCIES[index]
+                        .plus(Random.nextFloat() * FREQUENCY_SEGMENT_LENGTH)
+                        .minus(FREQUENCY_SEGMENT_LENGTH / 2)
                         .times(normalizedSpeed)
                 }
             }

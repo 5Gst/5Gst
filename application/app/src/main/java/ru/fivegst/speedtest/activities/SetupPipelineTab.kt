@@ -18,8 +18,7 @@ class SetupPipelineTab : Fragment() {
     private lateinit var addButton: Button
     private lateinit var adapter: StageConfigurationListViewAdapter
     private lateinit var listView: ListView
-    private val stageConfigurationParser =
-        _root_ide_package_.ru.fivegst.speedtest.parser.StageConfigurationParser()
+    private val stageConfigurationParser = StageConfigurationParser()
 
     companion object {
         private val TAG = SetupPipelineTab::class.java.simpleName
