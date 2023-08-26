@@ -1,31 +1,33 @@
 package ru.fivegst.speedtest.customViews;
 
-import android.app.Dialog;
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
+import ru.fivegst.speedtest.ApplicationConstants;
 import ru.fivegst.speedtest.R;
-import ru.fivegst.speedtest.activities.DevToolsTab;
 import ru.fivegst.speedtest.activities.OptionsActivity;
-import ru.fivegst.speedtest.activities.OptionsActivity;
+import ru.fivegst.speedtest.domain.LogMessage;
 
 
 public class HeaderView extends LinearLayout {
@@ -35,6 +37,7 @@ public class HeaderView extends LinearLayout {
     private Button modeBtn;
 
     private TextView sectionNameTV;
+    Gson gson =  new Gson();
 
     public HeaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -94,47 +97,33 @@ public class HeaderView extends LinearLayout {
     }
 
     private void goToHistory(Context context) {
-        final int LOGSIZE = 20;
-//        Log.d("HEADER", "goToHistory: pressed btn");
-        try {
-            String command = String.format("logcat -d -v threadtime *:*");
-            Process process = Runtime.getRuntime().exec(command);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            ArrayList<String> result = new ArrayList<>();
-            String currentLine = null;
-
-            int pid = android.os.Process.myPid();
-            while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.contains(String.valueOf(pid))) {
-                    String line = currentLine;
-                    String[] parts = line.split(" ");
-                    StringBuilder data = new StringBuilder();
-                    data.append(parts[1]);
-                    data.append(" ");
-                    for(int i = 3; i<parts.length; i++) {
-                        data.append(parts[i]);
-                        data.append(" ");
-                    }
-                    result.add(data.toString());
-                }
-            }
-
-            StringBuilder logData = new StringBuilder();
-            for(int i = result.size() - LOGSIZE; i < result.size(); i++){
-                logData.append(result.get(i));
-                logData.append("\n\n");
-            }
-
-            AlertDialog logs = new AlertDialog.Builder(context)
-                    .setTitle("app logs")
-                    .setMessage(logData.toString())
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create();
-            logs.show();
-        } catch (IOException e) {
-            Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+        String jsonGet = getContext()
+                .getSharedPreferences(getContext().getString(R.string.globalSharedPreferences), MODE_PRIVATE)
+                .getString(
+                        ApplicationConstants.UI_LOGS_KEY,
+                        gson.toJson(new ArrayList<LogMessage>())
+                );
+        Type type = new TypeToken<List<LogMessage>>() {
+        }.getType();
+        List<LogMessage> logData = gson.fromJson(jsonGet, type);
+        if (logData == null) {
+            logData = Collections.emptyList();
         }
+
+        StringBuilder logBuilder = new StringBuilder();
+        for(int i = logData.size() - 1; i >= 0; i--){
+            logBuilder.append(logData.get(i).toString());
+            logBuilder.append("\n\n");
+        }
+
+        AlertDialog logs = new AlertDialog.Builder(context)
+                .setTitle("app logs")
+                .setMessage(logBuilder.toString())
+                .setPositiveButton(android.R.string.ok, null)
+                .create();
+        Objects.requireNonNull(logs.getWindow())
+                .setWindowAnimations(R.style.AlertDialogAnimation);
+        logs.show();
     }
 
     private void goToDev(Context context) {

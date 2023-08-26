@@ -1,6 +1,7 @@
 package ru.fivegst.speedtest.activities;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -8,20 +9,16 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import kotlin.Unit;
 import kotlin.collections.SetsKt;
-import ru.fivegst.speedtest.ApplicationConstants;
-import ru.fivegst.speedtest.SpeedManager;
-import ru.fivegst.speedtest.Wave;
-import ru.fivegst.speedtest.customButtons.ActionButton;
-import ru.fivegst.speedtest.customButtons.SaveButton;
-import ru.fivegst.speedtest.customButtons.ShareButton;
-import ru.fivegst.speedtest.customViews.CardView;
-import ru.fivegst.speedtest.customViews.HeaderView;
-import ru.fivegst.speedtest.customViews.ResultView;
-import ru.fivegst.speedtest.customViews.SubResultView;
 import ru.fivegst.speedtest.ApplicationConstants;
 import ru.fivegst.speedtest.R;
 import ru.fivegst.speedtest.SpeedManager;
@@ -33,6 +30,7 @@ import ru.fivegst.speedtest.customViews.CardView;
 import ru.fivegst.speedtest.customViews.HeaderView;
 import ru.fivegst.speedtest.customViews.ResultView;
 import ru.fivegst.speedtest.customViews.SubResultView;
+import ru.fivegst.speedtest.domain.LogMessage;
 import ru.fivegst.speedtest.domain.SpeedTestResult;
 import ru.fivegst.speedtest.manager.DownloadUploadSpeedTestManager;
 import ru.fivegst.speedtest.parser.StageConfigurationParser;
@@ -55,8 +53,39 @@ public class SpeedActivity extends AppCompatActivity {
     private DownloadUploadSpeedTestManager speedTestManager;
     private final StageConfigurationParser stageConfigurationParser = new StageConfigurationParser();
 
+    private static final Gson GSON = new Gson();
     private final static String LOG_TAG = SpeedActivity.class.getSimpleName();
     private final static int TASK_DELAY = 2500;
+
+    public void addLogToPrefs(LogMessage logMessage) {
+        String logsJson = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
+                ApplicationConstants.UI_LOGS_KEY,
+                GSON.toJson(new ArrayList<LogMessage>())
+        );
+        Type type = new TypeToken<List<LogMessage>>() {
+        }.getType();
+        List<LogMessage> logData = GSON.fromJson(logsJson, type);
+
+        if (logData == null) {
+            logData = new ArrayList<>();
+        } else {
+            logData = new ArrayList<>(logData);
+        }
+
+        logData.add(logMessage);
+
+        SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
+        String updatedJson = GSON.toJson(logData);
+        prefEditor.putString(ApplicationConstants.UI_LOGS_KEY, updatedJson);
+        prefEditor.apply();
+    }
+
+    public void clearUiLogs() {
+        SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
+        String updatedJson = GSON.toJson(new ArrayList<LogMessage>());
+        prefEditor.putString(ApplicationConstants.UI_LOGS_KEY, updatedJson);
+        prefEditor.apply();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,12 +150,15 @@ public class SpeedActivity extends AppCompatActivity {
                     actionBtn.setPlay();
                 }))
                 .onFatalError((s, exception) -> runOnUiThread(() -> {
+                    addLogToPrefs(LogMessage.fromFatalError(s, exception));
                     Log.e(LOG_TAG, s, exception);
 
                     onStopUI();
                     actionBtn.setPlay();
                 }))
                 .onLog((tag, message, exception) -> {
+                    runOnUiThread(() ->
+                            addLogToPrefs(new LogMessage(tag, message, exception)));
                     if (exception == null) {
                         Log.v(tag, message);
                     } else {
@@ -196,6 +228,7 @@ public class SpeedActivity extends AppCompatActivity {
         saveBtn.setVisibility(View.GONE);
 
         sm.flushResults();
+        clearUiLogs();
         speedTestManager.start(
                 getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getBoolean(
                         ApplicationConstants.USE_BALANCER_KEY,
