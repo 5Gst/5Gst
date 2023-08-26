@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import kotlin.collections.MapsKt;
 import kotlin.text.StringsKt;
 import ru.fivegst.speedtest.ApplicationConstants;
-import ru.fivegst.speedtest.ApplicationConstants;
 import ru.fivegst.speedtest.R;
 
 
@@ -43,7 +42,7 @@ public class StartActivity extends AppCompatActivity {
     private static final String TAG = StartActivity.class.getSimpleName();
     private static final int SUGGEST_STORAGE_LIMIT = 10;
     private static final int SUGGEST_UI_LIMIT = 3;
-    private static final Gson GSON_CONSTRUCTOR = new Gson();
+    private static final Gson GSON = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,7 @@ public class StartActivity extends AppCompatActivity {
 
     public void saveSuggestToPrefs(Map<String, Date> map) {
         SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).edit();
-        String json = GSON_CONSTRUCTOR.toJson(map);
+        String json = GSON.toJson(map);
         prefEditor.putString(ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY, json);
         prefEditor.apply();
 
@@ -82,11 +81,11 @@ public class StartActivity extends AppCompatActivity {
     public Map<String, Date> getSuggestFromPrefs() {
         String json = getSharedPreferences(getString(R.string.globalSharedPreferences), MODE_PRIVATE).getString(
                 ApplicationConstants.MAIN_ADDRESS_SUGGEST_KEY,
-                GSON_CONSTRUCTOR.toJson(new HashMap<String, Date>())
+                GSON.toJson(new HashMap<String, Date>())
         );
         Type type = new TypeToken<Map<String, Date>>() {
         }.getType();
-        return GSON_CONSTRUCTOR.fromJson(json, type);
+        return GSON.fromJson(json, type);
     }
 
     private void updateSuggest() {
