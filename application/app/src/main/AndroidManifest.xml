@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.scoltech.openran.speedtest">
+    package="ru.fivegst.speedtest">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.SpeedActivity"
+            android:name="ru.fivegst.speedtest.activities.SpeedActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.StartActivity"
+            android:name="ru.fivegst.speedtest.activities.StartActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>

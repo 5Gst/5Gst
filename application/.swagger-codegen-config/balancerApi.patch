@@ -1,13 +1,13 @@
-Index: application/balancerApi/src/main/java/ru/scoltech/openran/speedtest/client/balancer/ApiClient.java
+Index: application/balancerApi/src/main/java/ru/fivegst/speedtest/client/balancer/ApiClient.java
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
---- application/balancerApi/src/main/java/ru/scoltech/openran/speedtest/client/balancer/ApiClient.java	(revision bb7f2b60becad303faf6c3f09b4f4a1b8044eb39)
-+++ application/balancerApi/src/main/java/ru/scoltech/openran/speedtest/client/balancer/ApiClient.java	(date 1658850546079)
+--- application/balancerApi/src/main/java/ru/fivegst/speedtest/client/balancer/ApiClient.java	(revision bb7f2b60becad303faf6c3f09b4f4a1b8044eb39)
++++ application/balancerApi/src/main/java/ru/fivegst/speedtest/client/balancer/ApiClient.java	(date 1658850546079)
 @@ -13,6 +13,7 @@
  
- package ru.scoltech.openran.speedtest.client.balancer;
+ package ru.fivegst.speedtest.client.balancer;
  
 +import com.google.gson.JsonSyntaxException;
  import com.squareup.okhttp.*;
