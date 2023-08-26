@@ -22,8 +22,8 @@ Returns iperf speed probes
 ### Example
 ```java
 // Import classes:
-//import ru.scoltech.openran.speedtest.client.service.ApiException;
-//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+//import ru.fivegst.speedtest.client.service.ApiException;
+//import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 
 ServiceApi apiInstance = new ServiceApi();
@@ -67,8 +67,8 @@ No authorization required
 ### Example
 ```java
 // Import classes:
-//import ru.scoltech.openran.speedtest.client.service.ApiException;
-//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+//import ru.fivegst.speedtest.client.service.ApiException;
+//import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 
 ServiceApi apiInstance = new ServiceApi();
@@ -111,8 +111,8 @@ No authorization required
 ### Example
 ```java
 // Import classes:
-//import ru.scoltech.openran.speedtest.client.service.ApiException;
-//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+//import ru.fivegst.speedtest.client.service.ApiException;
+//import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 
 ServiceApi apiInstance = new ServiceApi();
@@ -151,8 +151,8 @@ No authorization required
 ### Example
 ```java
 // Import classes:
-//import ru.scoltech.openran.speedtest.client.service.ApiException;
-//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+//import ru.fivegst.speedtest.client.service.ApiException;
+//import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 
 ServiceApi apiInstance = new ServiceApi();
@@ -191,8 +191,8 @@ No authorization required
 ### Example
 ```java
 // Import classes:
-//import ru.scoltech.openran.speedtest.client.service.ApiException;
-//import ru.scoltech.openran.speedtest.client.service.api.ServiceApi;
+//import ru.fivegst.speedtest.client.service.ApiException;
+//import ru.fivegst.speedtest.client.service.api.ServiceApi;
 
 
 ServiceApi apiInstance = new ServiceApi();
