@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import shlex
+import signal
 import subprocess
 import sys
 from apps.logic import iperf_parser_container
@@ -113,13 +114,20 @@ class IperfWrapper:
             return False
 
     def stop(self):
+        logger.info("Requesting to stop iPerf")
         if self.iperf_process is None:
+            logger.info("iPerf was already stopped. Quitting...")
             return 0
+
+        logger.info("Terminating iPerf process")
         self.is_udp_uploading = False
-        self.iperf_process.terminate()
+        self.iperf_process.send_signal(signal.SIGKILL)
+
+        logger.info("Waiting for iPerf to terminate...")
         self.iperf_waiting_thread.join()
         return_code = self.iperf_process.poll()
 
+        logger.info("iPerf successfully terminated with return code %d", return_code)
         return return_code
 
 
