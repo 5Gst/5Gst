@@ -5,11 +5,29 @@ import com.squareup.okhttp.HttpUrl
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.MultithreadedIperfOutputParser
-import ru.scoltech.openran.speedtest.task.*
-import ru.scoltech.openran.speedtest.task.impl.*
+import ru.scoltech.openran.speedtest.task.TaskChain
+import ru.scoltech.openran.speedtest.task.TaskChainBuilder
+import ru.scoltech.openran.speedtest.task.TaskConsumer
+import ru.scoltech.openran.speedtest.task.impl.BalancerApi
+import ru.scoltech.openran.speedtest.task.impl.BalancerApiBuilder
+import ru.scoltech.openran.speedtest.task.impl.DelayTask
+import ru.scoltech.openran.speedtest.task.impl.FiveGstLoginTask
+import ru.scoltech.openran.speedtest.task.impl.FiveGstLogoutTask
+import ru.scoltech.openran.speedtest.task.impl.GetMeasurementResultsTask
+import ru.scoltech.openran.speedtest.task.impl.ObtainServiceAddressTask
+import ru.scoltech.openran.speedtest.task.impl.ParseAddressTask
+import ru.scoltech.openran.speedtest.task.impl.PingAddressTask
+import ru.scoltech.openran.speedtest.task.impl.StartIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StartServiceIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StartServiceSessionTask
+import ru.scoltech.openran.speedtest.task.impl.StartUdpUploadIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StopServiceIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StopServiceSessionTask
 import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
+import ru.scoltech.openran.speedtest.task.withArgumentExtracted
+import ru.scoltech.openran.speedtest.task.withArgumentKeptDoUnstoppableTask
 import ru.scoltech.openran.speedtest.util.SkipThenAverageEqualizer
-import java.util.*
+import java.util.LongSummaryStatistics
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -27,7 +45,6 @@ private constructor(
     private val onStop: () -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
     private val onFatalError: (String, Exception?) -> Unit,
-    private val onConnectionWait: (Boolean) -> Unit,
 ) {
     private val lock = ReentrantLock()
     private var taskChain: TaskChain<*>? = null
@@ -116,9 +133,12 @@ private constructor(
             )
             val stopServiceIperfTask = StopServiceIperfTask()
 
-            val args = stageConfiguration.deviceArgs + stageConfiguration.serverArgs
-            if (args.contains("-u") && !args.contains("-R")) {
-                mutableTaskConsumer = makeTaskConsumerForUdpUpload(
+            // TODO parse arguments with some library without self-written regexes
+            val args = "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}"
+            if (args.contains(UDP_UPLOAD_ARGS_CONTAINS_REGEX) &&
+                !args.contains(UDP_UPLOAD_ARGS_NOT_CONTAINS_REGEX)
+            ) {
+                mutableTaskConsumer = addRemoteMeasurementStagesToChain(
                     mutableTaskConsumer,
                     immutableDeviceArgsPrefix,
                     stageConfiguration,
@@ -127,7 +147,7 @@ private constructor(
                     idleBetweenTasksMelees
                 )
             } else {
-                mutableTaskConsumer = makeAverageTaskConsumer(
+                mutableTaskConsumer = addLocalMeasurementStagesToChain(
                     mutableTaskConsumer,
                     immutableDeviceArgsPrefix,
                     stageConfiguration,
@@ -140,7 +160,7 @@ private constructor(
         return mutableTaskConsumer
     }
 
-    private fun makeTaskConsumerForUdpUpload(
+    private fun addRemoteMeasurementStagesToChain(
         mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
         immutableDeviceArgsPrefix: String,
         stageConfiguration: StageConfiguration,
@@ -158,9 +178,8 @@ private constructor(
             DEFAULT_TIMEOUT.toLong(),
             onStageSpeedUpdate,
             onLog,
-            onConnectionWait,
         )
-        mutableTaskConsumer
+        return mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
             .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
             .andThenTry {
@@ -171,15 +190,12 @@ private constructor(
             }
             .andThenFinally(stopServiceIperfTask)
             .andThen(
-                GetMeasurementResultsTask(
-                    { onStageFinish(stageConfiguration, it) },
-                )
+                GetMeasurementResultsTask { onStageFinish(stageConfiguration, it) }
             )
             .andThen(DelayTask(idleBetweenTasksMelees))
-        return mutableTaskConsumer
     }
 
-    private fun makeAverageTaskConsumer(
+    private fun addLocalMeasurementStagesToChain(
         mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
         immutableDeviceArgsPrefix: String,
         stageConfiguration: StageConfiguration,
@@ -200,7 +216,7 @@ private constructor(
             { onStageFinish(stageConfiguration, it) },
             onLog,
         )
-        mutableTaskConsumer
+        return mutableTaskConsumer
             .withArgumentExtracted { it.iperfAddress }
             .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
             .andThenTry {
@@ -212,7 +228,6 @@ private constructor(
             }
             .andThenFinally(stopServiceIperfTask)
             .andThen(DelayTask(idleBetweenTasksMelees))
-        return mutableTaskConsumer
     }
 
     fun buildDirectIperfChain(): TaskChain<String> {
@@ -266,7 +281,6 @@ private constructor(
         private var onStop: Runnable = Runnable {}
         private var onLog: (String, String, Exception?) -> Unit = { _, _, _ -> }
         private var onFatalError: BiConsumer<String, Exception?> = BiConsumer { _, _ -> }
-        private var onConnectionWait: Consumer<Boolean> = Consumer{}
 
         fun build(): DownloadUploadSpeedTestManager {
             return DownloadUploadSpeedTestManager(
@@ -279,7 +293,6 @@ private constructor(
                 onStop::run,
                 onLog::invoke,
                 onFatalError::accept,
-                onConnectionWait::accept,
             )
         }
 
@@ -322,17 +335,14 @@ private constructor(
             this.onFatalError = onFatalError
             return this
         }
-
-        fun onConnectionWait( onConnectionWait: Consumer<Boolean>): Builder {
-            this.onConnectionWait = onConnectionWait
-            return this
-        }
     }
 
     companion object {
         private const val DEFAULT_TIMEOUT = 5_000
         private const val DEFAULT_EQUALIZER_MAX_STORING = 4
         private const val DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP = 0
-        private const val DEFAULT_EQUALIZER_UPLOAD_VALUES_SKIP = 1
+
+        private val UDP_UPLOAD_ARGS_CONTAINS_REGEX = Regex("(^|[^-])(-u|--udp)(\$|\\s)")
+        private val UDP_UPLOAD_ARGS_NOT_CONTAINS_REGEX = Regex("(^|[^-])(-R|--reverse)(\$|\\s)")
     }
 }

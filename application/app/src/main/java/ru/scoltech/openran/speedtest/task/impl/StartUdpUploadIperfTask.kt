@@ -1,21 +1,15 @@
 package ru.scoltech.openran.speedtest.task.impl
 
-import android.location.GnssMeasurement
-import android.util.Log
-import org.apache.commons.collections.list.SynchronizedList
 import ru.scoltech.openran.speedtest.backend.IperfException
 import ru.scoltech.openran.speedtest.backend.IperfRunner
-import ru.scoltech.openran.speedtest.parser.IperfOutputParser
 import ru.scoltech.openran.speedtest.task.FatalException
 import ru.scoltech.openran.speedtest.task.Task
 import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
-import ru.scoltech.openran.speedtest.task.impl.model.ServerAddress
 import ru.scoltech.openran.speedtest.util.Equalizer
 import ru.scoltech.openran.speedtest.util.IdleTaskKiller
 import ru.scoltech.openran.speedtest.util.Promise
 import ru.scoltech.openran.speedtest.util.SkipThenAverageEqualizer
 import ru.scoltech.openran.speedtest.util.TaskKiller
-import java.io.IOException
 import java.util.LongSummaryStatistics
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -27,27 +21,27 @@ class StartUdpUploadIperfTask(
     private val idleTimeoutMillis: Long,
     private val onSpeedUpdate: (LongSummaryStatistics, Long) -> Unit,
     private val onLog: (String, String, Exception?) -> Unit,
-    private val onConnectionWait: (Boolean) -> Unit,
 ) : Task<ApiClientHolder, ApiClientHolder> {
     private val speedStatistics: LongSummaryStatistics = LongSummaryStatistics()
     private val lock = ReentrantLock()
+
     override fun prepare(
         argument: ApiClientHolder,
         killer: TaskKiller
     ): Promise<(ApiClientHolder) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
+        onLog(LOG_TAG, "Preparing udp upload iperf task", null)
+
         val idleTaskKiller = IdleTaskKiller()
-        val measurementPinger = IperfMeasurementPinger(argument, onLog) { data ->
+        val measurementPinger = IperfMeasurementPinger(argument, onLog) { results ->
             lock.withLock {
-                onConnectionWait(false)
-                for (el in data) {
-                    if (speedEqualizer.accept(el.toLong())) {
-                        speedStatistics.accept(el.toLong())
+                for (probeResult in results) {
+                    if (speedEqualizer.accept(probeResult.toLong())) {
+                        speedStatistics.accept(probeResult.toLong())
                     }
                 }
                 val equalizedSpeed = try {
                     speedEqualizer.getEqualized()
                 } catch (e: Equalizer.NoValueException) {
-                    onLog(LOG_TAG, "Wrong value pass to equalizer", e)
                     return@IperfMeasurementPinger
                 }
                 onSpeedUpdate(speedStatistics, equalizedSpeed.toLong())
@@ -66,7 +60,6 @@ class StartUdpUploadIperfTask(
 
 
         thread.start()
-        onConnectionWait(true)
 
         while (true) {
             try {
@@ -101,8 +94,8 @@ class StartUdpUploadIperfTask(
     ) {
 
         fun onIperfStdoutLine(line: String) {
-            idleTaskKiller.updateTaskState()
             onLog("iPerf stdout", line, null)
+            idleTaskKiller.updateTaskState()
         }
 
         fun onIperfStderrLine(line: String) {
@@ -111,7 +104,6 @@ class StartUdpUploadIperfTask(
         }
 
         fun onIperfFinish() {
-            onConnectionWait(false)
             thread.interrupt()
             onFinish()
         }

@@ -11,7 +11,7 @@ import ru.scoltech.openran.speedtest.util.IdleTaskKiller
 import ru.scoltech.openran.speedtest.util.Promise
 import ru.scoltech.openran.speedtest.util.TaskKiller
 import java.io.IOException
-import java.util.*
+import java.util.LongSummaryStatistics
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -29,6 +29,8 @@ class StartIperfTask(
         argument: ServerAddress,
         killer: TaskKiller
     ): Promise<(ServerAddress) -> Unit, (String, Exception?) -> Unit> = Promise { onSuccess, _ ->
+        onLog(LOG_TAG, "Preparing regular iperf task", null)
+
         val idleTaskKiller = IdleTaskKiller()
         val processor = IperfOutputProcessor(idleTaskKiller, speedEqualizer.copy()) {
             onSuccess?.invoke(argument)

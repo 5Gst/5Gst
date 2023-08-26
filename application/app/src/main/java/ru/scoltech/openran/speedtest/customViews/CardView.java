@@ -87,6 +87,7 @@ public class CardView extends LinearLayout {
 
 
     public void setInstantSpeed(int integerSpeed, int fractionSpeed) {
+        showNonEmptySpeed();
         setFractionSpeed(fractionSpeed);
         setIntegerSpeed(integerSpeed);
     }
@@ -121,20 +122,19 @@ public class CardView extends LinearLayout {
         return mWave;
     }
 
-    public void waitConnection(Boolean waiting){
-        if (waiting){
-            waitingMessage.setVisibility(VISIBLE);
-            integerSpeedTV.setVisibility(INVISIBLE);
-            dotCaption.setVisibility(INVISIBLE);
-            fractionSpeedTV.setVisibility(INVISIBLE);
-            mbpsCaption.setVisibility(INVISIBLE);
-        }
-        else{
-            waitingMessage.setVisibility(INVISIBLE);
-            integerSpeedTV.setVisibility(VISIBLE);
-            dotCaption.setVisibility(VISIBLE);
-            fractionSpeedTV.setVisibility(VISIBLE);
-            mbpsCaption.setVisibility(VISIBLE);
-        }
+    public void showEmptySpeed() {
+        waitingMessage.setVisibility(VISIBLE);
+        integerSpeedTV.setVisibility(INVISIBLE);
+        dotCaption.setVisibility(INVISIBLE);
+        fractionSpeedTV.setVisibility(INVISIBLE);
+        mbpsCaption.setVisibility(INVISIBLE);
+    }
+
+    public void showNonEmptySpeed() {
+        waitingMessage.setVisibility(INVISIBLE);
+        integerSpeedTV.setVisibility(VISIBLE);
+        dotCaption.setVisibility(VISIBLE);
+        fractionSpeedTV.setVisibility(VISIBLE);
+        mbpsCaption.setVisibility(VISIBLE);
     }
 }
