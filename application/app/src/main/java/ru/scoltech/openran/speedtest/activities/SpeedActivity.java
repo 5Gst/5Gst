@@ -9,7 +9,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import kotlin.Unit;
 import kotlin.collections.SetsKt;
@@ -79,6 +78,7 @@ public class SpeedActivity extends AppCompatActivity {
                 .onPingUpdate((ping) -> runOnUiThread(() -> mCard.setPing((int) ping)))
                 .onStageStart((stageConfiguration) -> runOnUiThread(() -> {
                     mCard.setInstantSpeed(0, 0);
+                    mCard.showEmptySpeed();
                     mSubResults.addNewStage(stageConfiguration.getName());
 
                     cWave.start();
@@ -86,12 +86,14 @@ public class SpeedActivity extends AppCompatActivity {
                 }))
                 .onStageSpeedUpdate((statistics, speedBitsPS) -> runOnUiThread(() -> {
                     Pair<Integer, Integer> instSpeed = sm.getSpeedWithPrecision(speedBitsPS.intValue(), 2);
+                    mCard.showNonEmptySpeed();
                     mCard.setInstantSpeed(instSpeed.first, instSpeed.second);
 
                     //animation
                     cWave.attachSpeed(instSpeed.first);
                 }))
                 .onStageFinish((stageConfiguration, statistics) -> runOnUiThread(() -> {
+                    mCard.showNonEmptySpeed();
                     final String speedString = getSpeedString(sm.getAverageSpeed(statistics));
                     mSubResults.setCurrentStageSpeed(speedString);
                     sm.addStageResult(stageConfiguration, speedString);
@@ -148,6 +150,7 @@ public class SpeedActivity extends AppCompatActivity {
 
         mResults.setVisibility(View.VISIBLE);
 
+        mCard.showNonEmptySpeed();
         mCard.setEmptyCaptions();
         mCard.setMessage("Done");
 
@@ -165,6 +168,7 @@ public class SpeedActivity extends AppCompatActivity {
     }
 
     public void onPlayUI() {
+        mCard.showNonEmptySpeed();
         mCard.setDefaultCaptions();
 
         cWave.attachColor(getColor(R.color.mint));
@@ -199,6 +203,7 @@ public class SpeedActivity extends AppCompatActivity {
 
     public void onStopUI() {
         mHeader.enableButtonGroup();
+        mCard.showNonEmptySpeed();
 
         cWave.stop();
         actionBtn.setPlay();

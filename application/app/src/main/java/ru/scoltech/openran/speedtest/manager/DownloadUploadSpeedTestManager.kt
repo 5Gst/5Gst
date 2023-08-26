@@ -5,11 +5,29 @@ import com.squareup.okhttp.HttpUrl
 import ru.scoltech.openran.speedtest.R
 import ru.scoltech.openran.speedtest.domain.StageConfiguration
 import ru.scoltech.openran.speedtest.parser.MultithreadedIperfOutputParser
-import ru.scoltech.openran.speedtest.task.*
-import ru.scoltech.openran.speedtest.task.impl.*
+import ru.scoltech.openran.speedtest.task.TaskChain
+import ru.scoltech.openran.speedtest.task.TaskChainBuilder
+import ru.scoltech.openran.speedtest.task.TaskConsumer
+import ru.scoltech.openran.speedtest.task.impl.BalancerApi
+import ru.scoltech.openran.speedtest.task.impl.BalancerApiBuilder
+import ru.scoltech.openran.speedtest.task.impl.DelayTask
+import ru.scoltech.openran.speedtest.task.impl.FiveGstLoginTask
+import ru.scoltech.openran.speedtest.task.impl.FiveGstLogoutTask
+import ru.scoltech.openran.speedtest.task.impl.GetMeasurementResultsTask
+import ru.scoltech.openran.speedtest.task.impl.ObtainServiceAddressTask
+import ru.scoltech.openran.speedtest.task.impl.ParseAddressTask
+import ru.scoltech.openran.speedtest.task.impl.PingAddressTask
+import ru.scoltech.openran.speedtest.task.impl.StartIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StartServiceIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StartServiceSessionTask
+import ru.scoltech.openran.speedtest.task.impl.StartUdpUploadIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StopServiceIperfTask
+import ru.scoltech.openran.speedtest.task.impl.StopServiceSessionTask
 import ru.scoltech.openran.speedtest.task.impl.model.ApiClientHolder
+import ru.scoltech.openran.speedtest.task.withArgumentExtracted
+import ru.scoltech.openran.speedtest.task.withArgumentKeptDoUnstoppableTask
 import ru.scoltech.openran.speedtest.util.SkipThenAverageEqualizer
-import java.util.*
+import java.util.LongSummaryStatistics
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -115,34 +133,101 @@ private constructor(
             )
             val stopServiceIperfTask = StopServiceIperfTask()
 
-            val startIperfTask = StartIperfTask(
-                context.filesDir.absolutePath,
-                "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
-                MultithreadedIperfOutputParser(),
-                SkipThenAverageEqualizer(
-                    DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
-                    DEFAULT_EQUALIZER_MAX_STORING
-                ),
-                DEFAULT_TIMEOUT.toLong(),
-                onStageSpeedUpdate,
-                { onStageFinish(stageConfiguration, it) },
-                onLog
-            )
-
-            mutableTaskConsumer = mutableTaskConsumer
-                .withArgumentExtracted { it.iperfAddress }
-                .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
-                .andThenTry {
-                    initializeNewChain()
-                        .andThen(startServiceIperfTask)
-                        .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
-                        .withArgumentExtracted { it.iperfAddress }
-                        .doTask(startIperfTask)
-                }
-                .andThenFinally(stopServiceIperfTask)
-                .andThen(DelayTask(idleBetweenTasksMelees))
+            // TODO parse arguments with some library without self-written regexes
+            val args = "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}"
+            if (args.contains(UDP_UPLOAD_ARGS_CONTAINS_REGEX) &&
+                !args.contains(UDP_UPLOAD_ARGS_NOT_CONTAINS_REGEX)
+            ) {
+                mutableTaskConsumer = addRemoteMeasurementStagesToChain(
+                    mutableTaskConsumer,
+                    immutableDeviceArgsPrefix,
+                    stageConfiguration,
+                    startServiceIperfTask,
+                    stopServiceIperfTask,
+                    idleBetweenTasksMelees
+                )
+            } else {
+                mutableTaskConsumer = addLocalMeasurementStagesToChain(
+                    mutableTaskConsumer,
+                    immutableDeviceArgsPrefix,
+                    stageConfiguration,
+                    startServiceIperfTask,
+                    stopServiceIperfTask,
+                    idleBetweenTasksMelees
+                )
+            }
         }
         return mutableTaskConsumer
+    }
+
+    private fun addRemoteMeasurementStagesToChain(
+        mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
+        immutableDeviceArgsPrefix: String,
+        stageConfiguration: StageConfiguration,
+        startServiceIperfTask: StartServiceIperfTask,
+        stopServiceIperfTask: StopServiceIperfTask,
+        idleBetweenTasksMelees: Long,
+    ): TaskConsumer<ApiClientHolder> {
+        val startUdpUploadIperfTask = StartUdpUploadIperfTask(
+            context.filesDir.absolutePath,
+            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+            SkipThenAverageEqualizer(
+                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                DEFAULT_EQUALIZER_MAX_STORING
+            ),
+            DEFAULT_TIMEOUT.toLong(),
+            onStageSpeedUpdate,
+            onLog,
+        )
+        return mutableTaskConsumer
+            .withArgumentExtracted { it.iperfAddress }
+            .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+            .andThenTry {
+                initializeNewChain()
+                    .andThen(startServiceIperfTask)
+                    .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                    .andThen(startUdpUploadIperfTask)
+            }
+            .andThenFinally(stopServiceIperfTask)
+            .andThen(
+                GetMeasurementResultsTask { onStageFinish(stageConfiguration, it) }
+            )
+            .andThen(DelayTask(idleBetweenTasksMelees))
+    }
+
+    private fun addLocalMeasurementStagesToChain(
+        mutableTaskConsumer: TaskConsumer<ApiClientHolder>,
+        immutableDeviceArgsPrefix: String,
+        stageConfiguration: StageConfiguration,
+        startServiceIperfTask: StartServiceIperfTask,
+        stopServiceIperfTask: StopServiceIperfTask,
+        idleBetweenTasksMelees: Long,
+    ): TaskConsumer<ApiClientHolder> {
+        val startIperfTask = StartIperfTask(
+            context.filesDir.absolutePath,
+            "$immutableDeviceArgsPrefix ${stageConfiguration.deviceArgs}",
+            MultithreadedIperfOutputParser(),
+            SkipThenAverageEqualizer(
+                DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP,
+                DEFAULT_EQUALIZER_MAX_STORING
+            ),
+            DEFAULT_TIMEOUT.toLong(),
+            onStageSpeedUpdate,
+            { onStageFinish(stageConfiguration, it) },
+            onLog,
+        )
+        return mutableTaskConsumer
+            .withArgumentExtracted { it.iperfAddress }
+            .doTask(PingAddressTask(DEFAULT_TIMEOUT.toLong(), onPingUpdate))
+            .andThenTry {
+                initializeNewChain()
+                    .andThen(startServiceIperfTask)
+                    .withArgumentKeptDoUnstoppableTask { onStageStart(stageConfiguration) }
+                    .withArgumentExtracted { it.iperfAddress }
+                    .doTask(startIperfTask)
+            }
+            .andThenFinally(stopServiceIperfTask)
+            .andThen(DelayTask(idleBetweenTasksMelees))
     }
 
     fun buildDirectIperfChain(): TaskChain<String> {
@@ -171,7 +256,7 @@ private constructor(
                     DEFAULT_TIMEOUT.toLong(),
                     onStageSpeedUpdate,
                     { onStageFinish(stageConfiguration, it) },
-                    onLog
+                    onLog,
                 )
             )
         return chainBuilder.finishChainCreation(taskConsumer) {
@@ -256,6 +341,8 @@ private constructor(
         private const val DEFAULT_TIMEOUT = 5_000
         private const val DEFAULT_EQUALIZER_MAX_STORING = 4
         private const val DEFAULT_EQUALIZER_DOWNLOAD_VALUES_SKIP = 0
-        private const val DEFAULT_EQUALIZER_UPLOAD_VALUES_SKIP = 1
+
+        private val UDP_UPLOAD_ARGS_CONTAINS_REGEX = Regex("(^|[^-])(-u|--udp)(\$|\\s)")
+        private val UDP_UPLOAD_ARGS_NOT_CONTAINS_REGEX = Regex("(^|[^-])(-R|--reverse)(\$|\\s)")
     }
 }

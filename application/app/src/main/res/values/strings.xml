@@ -60,9 +60,9 @@
     <string name="dev_iperf_args">dev_iperf_args</string>
     <string name="dev_tools_iperf_args_hint">Enter iPerf script</string>
     <string name="download_device_iperf_args">-u -R -P 10 -b 120m</string>
-    <string name="upload_device_iperf_args">-P 10 -b 120m</string>
+    <string name="upload_device_iperf_args">-u -P 10 -b 120m</string>
     <string name="download_server_iperf_args">-u</string>
-    <string name="upload_server_iperf_args"> </string>
+    <string name="upload_server_iperf_args">-u </string>
     <string name="immutable_device_args" tools:ignore="TypographyDashes">-f b -i 0.1 --sum-only</string>
     <string name="immutable_server_args">-s</string>
 
@@ -78,4 +78,5 @@
     <string name="pipeline_shared_storage_name">pipeline_shared_storage</string>
     <string name="stage_field_name">data</string>
     <string name="show_suggestions">Show suggestions</string>
+    <string name="waiting_for_results">waiting for results</string>
 </resources>

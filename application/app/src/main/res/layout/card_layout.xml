@@ -19,6 +19,22 @@
         android:gravity="center_horizontal">
 
         <TextView
+            android:id="@+id/waiting_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintLeft_toLeftOf="@+id/speed_info"
+            app:layout_constraintRight_toRightOf="@+id/speed_info"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:fontFamily="@font/futura_pt_demi"
+            android:text="@string/waiting_for_results"
+            android:textAppearance="@style/Headline2"
+            android:textColor="@color/colorLightBackground"
+            android:visibility="invisible"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
             android:id="@+id/integer_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
