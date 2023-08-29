@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class IperfMeasurementHistoryAPI:
     create_swagger_auto_schema = swagger_auto_schema(
-        operation_description='saves iperf measurement data',
+        operation_description='saves iperf measurement results',
         operation_id='create',
         request_body=IperfMeasurementResultSerializer,
         responses={
@@ -29,14 +29,14 @@ class IperfMeasurementHistoryAPI:
             serializer_for_writing = IperfMeasurementResultSerializer(data=data)
             serializer_for_writing.is_valid(raise_exception=True)
             serializer_for_writing.save()
-            logger.info('Saved user iperf measurement results in database')
+            logger.info('Saved iperf measurement results in database')
             return Response(status=status.HTTP_201_CREATED)
         except ValidationError as exc:
             logger.error(f"Error {exc.status_code} happened: {exc.detail}", exc_info=exc)
-            raise BadRequest('Could not save user iperf measurement results in database')
+            raise BadRequest('Could not save iperf measurement results in database')
 
     read_swagger_auto_schema = swagger_auto_schema(
-        operation_description='returns iperf measurement data',
+        operation_description='returns iperf measurement results',
         operation_id='read',
         request_body=IperfMeasurementResultSerializer,
         manual_parameters=[
@@ -47,8 +47,9 @@ class IperfMeasurementHistoryAPI:
             ),
         ],
         responses={
-            200: openapi.Response('Last record from iperf statistics has been fetched', ),
-            400: openapi.Response('Measurement ID not received to get data'),
+            200: openapi.Response('Iperf measurement result has been fetched',
+                                  IperfMeasurementResultSerializer),
+            400: openapi.Response('Invalid measurement id'),
         }
     )
 
