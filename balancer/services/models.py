@@ -54,7 +54,11 @@ class FiveGstToken(models.Model):
         ]
 
 
-class IperfStatistics(models.Model):
-    results = models.JSONField()
+class IperfMeasurementResult(models.Model):
     start_timestamp = models.DateTimeField()
 
+
+class IperfProbeResult(models.Model):
+    timestamp = models.DateTimeField()
+    speed_bits_per_second = models.IntegerField()
+    measurement = models.ForeignKey('IperfMeasurementResult', on_delete=models.CASCADE, related_name='probes')
