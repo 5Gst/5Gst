@@ -38,7 +38,6 @@ class IperfMeasurementHistoryAPI:
     read_swagger_auto_schema = swagger_auto_schema(
         operation_description='Return measurement results',
         operation_id='read',
-        query_serializer=IperfMeasurementResultSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'measurement_id',
