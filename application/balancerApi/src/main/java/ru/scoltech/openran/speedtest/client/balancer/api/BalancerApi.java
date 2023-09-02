@@ -28,6 +28,7 @@ import java.io.IOException;
 
 
 import ru.scoltech.openran.speedtest.client.balancer.model.FiveGstToken;
+import ru.scoltech.openran.speedtest.client.balancer.model.IperfMeasurementResult;
 import ru.scoltech.openran.speedtest.client.balancer.model.ServerAddressRequest;
 import ru.scoltech.openran.speedtest.client.balancer.model.ServerAddressResponse;
 
@@ -171,13 +172,14 @@ public class BalancerApi {
     }
     /**
      * Build call for create
+     * @param data  (required)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call createCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        Object localVarPostBody = null;
+    public com.squareup.okhttp.Call createCall(IperfMeasurementResult data, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = data;
 
         // create path and map variables
         String localVarPath = "/5gst/iperf_load_balancer/0.1.0/service/stats/";
@@ -218,42 +220,50 @@ public class BalancerApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call createValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call createValidateBeforeCall(IperfMeasurementResult data, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'data' is set
+        if (data == null) {
+            throw new ApiException("Missing the required parameter 'data' when calling create(Async)");
+        }
         
 
-        com.squareup.okhttp.Call call = createCall(progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = createCall(data, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
      * 
-     * 
+     * Save measurement results
+     * @param data  (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void create() throws ApiException {
-        createWithHttpInfo();
+    public void create(IperfMeasurementResult data) throws ApiException {
+        createWithHttpInfo(data);
     }
 
     /**
      * 
-     * 
+     * Save measurement results
+     * @param data  (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> createWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = createValidateBeforeCall(null, null);
+    public ApiResponse<Void> createWithHttpInfo(IperfMeasurementResult data) throws ApiException {
+        com.squareup.okhttp.Call call = createValidateBeforeCall(data, null, null);
         return apiClient.execute(call);
     }
 
     /**
      *  (asynchronously)
-     * 
+     * Save measurement results
+     * @param data  (required)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call createAsync(final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call createAsync(IperfMeasurementResult data, final ApiCallback<Void> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -274,7 +284,7 @@ public class BalancerApi {
             };
         }
 
-        com.squareup.okhttp.Call call = createValidateBeforeCall(progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = createValidateBeforeCall(data, progressListener, progressRequestListener);
         apiClient.executeAsync(call, callback);
         return call;
     }
@@ -611,12 +621,13 @@ public class BalancerApi {
     }
     /**
      * Build call for read
+     * @param measurementId  (optional)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call readCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call readCall(Integer measurementId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -624,6 +635,8 @@ public class BalancerApi {
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        if (measurementId != null)
+        localVarQueryParams.addAll(apiClient.parameterToPair("measurement_id", measurementId));
 
         Map<String, String> localVarHeaderParams = new HashMap<String, String>();
 
@@ -658,42 +671,48 @@ public class BalancerApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call readValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call readValidateBeforeCall(Integer measurementId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
 
-        com.squareup.okhttp.Call call = readCall(progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = readCall(measurementId, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
      * 
-     * 
+     * Return measurement results
+     * @param measurementId  (optional)
+     * @return IperfMeasurementResult
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void read() throws ApiException {
-        readWithHttpInfo();
+    public IperfMeasurementResult read(Integer measurementId) throws ApiException {
+        ApiResponse<IperfMeasurementResult> resp = readWithHttpInfo(measurementId);
+        return resp.getData();
     }
 
     /**
      * 
-     * 
-     * @return ApiResponse&lt;Void&gt;
+     * Return measurement results
+     * @param measurementId  (optional)
+     * @return ApiResponse&lt;IperfMeasurementResult&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> readWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = readValidateBeforeCall(null, null);
-        return apiClient.execute(call);
+    public ApiResponse<IperfMeasurementResult> readWithHttpInfo(Integer measurementId) throws ApiException {
+        com.squareup.okhttp.Call call = readValidateBeforeCall(measurementId, null, null);
+        Type localVarReturnType = new TypeToken<IperfMeasurementResult>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
      *  (asynchronously)
-     * 
+     * Return measurement results
+     * @param measurementId  (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call readAsync(final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call readAsync(Integer measurementId, final ApiCallback<IperfMeasurementResult> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -714,8 +733,9 @@ public class BalancerApi {
             };
         }
 
-        com.squareup.okhttp.Call call = readValidateBeforeCall(progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        com.squareup.okhttp.Call call = readValidateBeforeCall(measurementId, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<IperfMeasurementResult>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
     /**

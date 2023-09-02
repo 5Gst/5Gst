@@ -122,6 +122,8 @@ Class | Method | HTTP request | Description
 ## Documentation for Models
 
  - [FiveGstToken](docs/FiveGstToken.md)
+ - [IperfMeasurementResult](docs/IperfMeasurementResult.md)
+ - [IperfProbeResults](docs/IperfProbeResults.md)
  - [ServerAddressRequest](docs/ServerAddressRequest.md)
  - [ServerAddressResponse](docs/ServerAddressResponse.md)
 

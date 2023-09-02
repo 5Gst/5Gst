@@ -67,11 +67,11 @@ This endpoint does not need any parameter.
 
 <a name="create"></a>
 # **create**
-> create()
+> create(data)
 
 
 
-
+Save measurement results
 
 ### Example
 ```java
@@ -91,8 +91,9 @@ ApiKeyAuth 5Gst = (ApiKeyAuth) defaultClient.getAuthentication("5Gst");
 //5Gst.setApiKeyPrefix("Token");
 
 BalancerApi apiInstance = new BalancerApi();
+IperfMeasurementResult data = new IperfMeasurementResult(); // IperfMeasurementResult | 
 try {
-    apiInstance.create();
+    apiInstance.create(data);
 } catch (ApiException e) {
     System.err.println("Exception when calling BalancerApi#create");
     e.printStackTrace();
@@ -100,7 +101,10 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **data** | [**IperfMeasurementResult**](IperfMeasurementResult.md)|  |
 
 ### Return type
 
@@ -248,11 +252,11 @@ No authorization required
 
 <a name="read"></a>
 # **read**
-> read()
+> IperfMeasurementResult read(measurementId)
 
 
 
-
+Return measurement results
 
 ### Example
 ```java
@@ -272,8 +276,10 @@ ApiKeyAuth 5Gst = (ApiKeyAuth) defaultClient.getAuthentication("5Gst");
 //5Gst.setApiKeyPrefix("Token");
 
 BalancerApi apiInstance = new BalancerApi();
+Integer measurementId = 56; // Integer | 
 try {
-    apiInstance.read();
+    IperfMeasurementResult result = apiInstance.read(measurementId);
+    System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling BalancerApi#read");
     e.printStackTrace();
@@ -281,11 +287,14 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **measurementId** | **Integer**|  | [optional]
 
 ### Return type
 
-null (empty response body)
+[**IperfMeasurementResult**](IperfMeasurementResult.md)
 
 ### Authorization
 

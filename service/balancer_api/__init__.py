@@ -23,5 +23,7 @@ from balancer_api.api_client import ApiClient
 from balancer_api.configuration import Configuration
 # import models into sdk package
 from balancer_api.models.five_gst_token import FiveGstToken
+from balancer_api.models.iperf_measurement_result import IperfMeasurementResult
+from balancer_api.models.iperf_probe_results import IperfProbeResults
 from balancer_api.models.server_address_request import ServerAddressRequest
 from balancer_api.models.server_address_response import ServerAddressResponse

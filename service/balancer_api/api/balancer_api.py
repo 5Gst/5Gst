@@ -124,43 +124,45 @@ class BalancerApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create(self, **kwargs):  # noqa: E501
+    def create(self, data, **kwargs):  # noqa: E501
         """create  # noqa: E501
 
-          # noqa: E501
+        Save measurement results  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create(async_req=True)
+        >>> thread = api.create(data, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
+        :param IperfMeasurementResult data: (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_with_http_info(**kwargs)  # noqa: E501
+            return self.create_with_http_info(data, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.create_with_http_info(data, **kwargs)  # noqa: E501
             return data
 
-    def create_with_http_info(self, **kwargs):  # noqa: E501
+    def create_with_http_info(self, data, **kwargs):  # noqa: E501
         """create  # noqa: E501
 
-          # noqa: E501
+        Save measurement results  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_with_http_info(async_req=True)
+        >>> thread = api.create_with_http_info(data, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
+        :param IperfMeasurementResult data: (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['data']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -175,6 +177,10 @@ class BalancerApi(object):
                 )
             params[key] = val
         del params['kwargs']
+        # verify the required parameter 'data' is set
+        if self.api_client.client_side_validation and ('data' not in params or
+                                                       params['data'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `data` when calling `create`")  # noqa: E501
 
         collection_formats = {}
 
@@ -188,6 +194,8 @@ class BalancerApi(object):
         local_var_files = {}
 
         body_params = None
+        if 'data' in params:
+            body_params = params['data']
         # HTTP header `Accept`
         header_params['Accept'] = self.api_client.select_header_accept(
             ['application/json'])  # noqa: E501
@@ -491,14 +499,15 @@ class BalancerApi(object):
     def read(self, **kwargs):  # noqa: E501
         """read  # noqa: E501
 
-          # noqa: E501
+        Return measurement results  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.read(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :return: None
+        :param int measurement_id:
+        :return: IperfMeasurementResult
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -512,19 +521,20 @@ class BalancerApi(object):
     def read_with_http_info(self, **kwargs):  # noqa: E501
         """read  # noqa: E501
 
-          # noqa: E501
+        Return measurement results  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.read_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :return: None
+        :param int measurement_id:
+        :return: IperfMeasurementResult
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['measurement_id']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -545,6 +555,8 @@ class BalancerApi(object):
         path_params = {}
 
         query_params = []
+        if 'measurement_id' in params:
+            query_params.append(('measurement_id', params['measurement_id']))  # noqa: E501
 
         header_params = {}
 
@@ -571,7 +583,7 @@ class BalancerApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type=None,  # noqa: E501
+            response_type='IperfMeasurementResult',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

@@ -16,5 +16,7 @@ from __future__ import absolute_import
 
 # import models into model package
 from balancer_api.models.five_gst_token import FiveGstToken
+from balancer_api.models.iperf_measurement_result import IperfMeasurementResult
+from balancer_api.models.iperf_probe_results import IperfProbeResults
 from balancer_api.models.server_address_request import ServerAddressRequest
 from balancer_api.models.server_address_response import ServerAddressResponse

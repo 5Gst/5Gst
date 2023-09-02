@@ -14,6 +14,7 @@
 package ru.scoltech.openran.speedtest.client.balancer.api;
 
 import ru.scoltech.openran.speedtest.client.balancer.model.FiveGstToken;
+import ru.scoltech.openran.speedtest.client.balancer.model.IperfMeasurementResult;
 import ru.scoltech.openran.speedtest.client.balancer.model.ServerAddressRequest;
 import ru.scoltech.openran.speedtest.client.balancer.model.ServerAddressResponse;
 import org.junit.Test;
@@ -52,14 +53,15 @@ public class BalancerApiTest {
     /**
      * 
      *
-     * 
+     * Save measurement results
      *
      * @throws Exception
      *          if the Api call fails
      */
     @Test
     public void createTest() throws Exception {
-        api.create();
+        IperfMeasurementResult data = null;
+        api.create(data);
 
         // TODO: test validations
     }
@@ -112,14 +114,15 @@ public class BalancerApiTest {
     /**
      * 
      *
-     * 
+     * Return measurement results
      *
      * @throws Exception
      *          if the Api call fails
      */
     @Test
     public void readTest() throws Exception {
-        api.read();
+        Integer measurementId = null;
+        IperfMeasurementResult response = api.read(measurementId);
 
         // TODO: test validations
     }
